@@ -1,0 +1,19 @@
+{
+    "name": "SS316L",
+    "density": {
+        "print_name": "Density at 298 K",
+        "value": 7955,
+        "unit": "kg/m^3",
+        "reference": "C.S. Kim, Thermophysical properties of stainless steels, Argonne National Laboratory, Argonne, Illinois, 1975.",
+        "uncertainty": "None",
+        "print_symbol": "\rho"
+    },
+    "liquidus_temperature": {
+        "print_name": "Liquidus temperature",
+        "value": 1730,
+        "unit": "K",
+        "reference": "C.S. Kim, Thermophysical properties of stainless steels, Argonne National Laboratory, Argonne, Illinois, 1975.",
+        "uncertainty": "None",
+        "print_symbol": "T_{l}"
+    }
+}
