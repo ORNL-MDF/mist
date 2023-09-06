@@ -13,7 +13,7 @@ class TestSuite(unittest.TestCase):
 
     def test_property_creation(self):
         # Manual creation
-        prop = mist.core.Property("density", 2.0, "kg/m^3")
+        prop = mist.core.Property("density", "kg/m^3", 2.0)
         assert(prop.name == "density")
         assert(abs(prop.value - 2.0) < 1.0e-13)
         assert(prop.unit == "kg/m^3")
@@ -21,7 +21,7 @@ class TestSuite(unittest.TestCase):
         assert(prop.uncertainty == None)
         assert(prop.print_symbol == None)
 
-        prop = mist.core.Property("density", 2.0, "kg/m^3", uncertainty = 1.5)
+        prop = mist.core.Property("density", "kg/m^3", 2.0, uncertainty = 1.5)
         assert(prop.name == "density")
         assert(abs(prop.value - 2.0) < 1.0e-13)
         assert(prop.unit == "kg/m^3")
@@ -41,7 +41,7 @@ class TestSuite(unittest.TestCase):
         assert(properties['density'].unit == "kg/m^3")
         assert(properties['density'].reference == "C.S. Kim, Thermophysical properties of stainless steels, Argonne National Laboratory, Argonne, Illinois, 1975.") 
         assert(properties['density'].uncertainty == None)
-        assert(properties['density'].print_symbol == "\rho")
+        assert(properties['density'].print_symbol == "\\rho")
 
         assert(properties['liquidus_temperature'].name == "liquidus_temperature")
         assert(abs(properties['liquidus_temperature'].value - 1730.0) < 1.0e-13)
