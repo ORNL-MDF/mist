@@ -202,10 +202,9 @@ class MaterialInformation:
     def write_pdf(self, file):
         # Write a PDF file with the current material information
         temp_md_file = "temp.md"
-        pdf_file = "test.pdf"
         self.write_markdown(temp_md_file)
         doc = pandoc.read(file=temp_md_file)
-        pandoc.write(doc, file=pdf_file, format='pdf', options=['-V', 'geometry:margin=1in'])
+        pandoc.write(doc, file=file, format='pdf', options=['-V', 'geometry:margin=1in'])
         os.remove(temp_md_file)
 
         return

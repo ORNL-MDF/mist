@@ -54,14 +54,14 @@ class TestSuite(unittest.TestCase):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
         mat = mist.core.MaterialInformation(path_to_example_data)
         
-        file = "markdown_test.md"
+        file = "markdown_test_SS316L.md"
         mat.write_markdown(file)
 
     def test_write_pdf(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
         mat = mist.core.MaterialInformation(path_to_example_data)
         
-        file = "markdown_test.md"
+        file = "pdf_test_SS316L.pdf"
         mat.write_pdf(file)
 
 
