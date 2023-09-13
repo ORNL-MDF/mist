@@ -30,7 +30,7 @@ class TestSuite(unittest.TestCase):
         assert(prop.print_symbol == None)
 
     def test_material_information_creation(self):
-        # Create from a JSON file
+        # Create from the SS316L JSON file
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
         mat = mist.core.MaterialInformation(path_to_example_data)
 
@@ -49,6 +49,33 @@ class TestSuite(unittest.TestCase):
         assert(properties['liquidus_temperature'].reference == "C.S. Kim, Thermophysical properties of stainless steels, Argonne National Laboratory, Argonne, Illinois, 1975.") 
         assert(properties['liquidus_temperature'].uncertainty == None)
         assert(properties['liquidus_temperature'].print_symbol == "T_{l}")
+
+        # Create from the AlCu JSON file
+        path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/AlCu.json')
+        mat = mist.core.MaterialInformation(path_to_example_data)
+
+        assert(mat.name == "AlCu")
+        properties = mat.properties
+        phase_properties = mat.phase_properties
+
+        assert(mat.base_element == "Al")
+        assert(mat.solute_elements == ["Cu"])
+
+        assert(properties['solidus_eutectic_temperature'].name == "solidus_eutectic_temperature")
+        assert(abs(properties['solidus_eutectic_temperature'].value - 821.15) < 1.0e-13)
+        assert(properties['solidus_eutectic_temperature'].unit == "K")
+        assert(properties['solidus_eutectic_temperature'].reference == "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.") 
+        assert(properties['solidus_eutectic_temperature'].uncertainty == None)
+        assert(properties['solidus_eutectic_temperature'].print_symbol == "T_{s}")
+
+        assert(phase_properties['liquid'].name == 'liquid')
+        solute_diffusivities = phase_properties['liquid'].properties['solute_diffusivities']
+        assert(abs(solute_diffusivities["Cu"].value - 2.4e-9) < 1.0e-13)
+
+        assert(abs(phase_properties['alpha'].properties['gibbs_thomson_coeff'].value - 2.4e-7) < 1.0e-13)
+        
+        assert(abs(phase_properties['theta'].properties['solubility_limit'].value - 31.9) < 1.0e-13)
+
 
     def test_write_markdown(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')

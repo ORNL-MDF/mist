@@ -1,0 +1,104 @@
+{
+    "name": "AlCu",
+    "note": "This file currently is focused on quantities for eutectic microstructure prediction in binary alloys.",
+    "composition": {
+        "base_element" : "Al",
+        "solute_elements" : ["Cu"]
+    },
+    "thermophysical_properties" : {
+        "solidus_eutectic_temperature": {
+            "print_name": "Solidus/eutectic temperature",
+            "value": 821.15,
+            "unit": "K",
+            "reference": "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.",
+            "uncertainty": "None",
+            "print_symbol": "T_{s}"
+        }
+    },
+    "single_phase_properties" : {
+        "phases" : ["liquid", "alpha", "theta"],
+        "liquid" : {
+            "print_name" : "Liquid",
+            "solute_diffusivities" : {
+                "Cu" : {
+                    "print_name": "Diffusivity (Cu in liquid AlCu)",
+                    "value": 2.4e-9,
+                    "unit": "m^2/s",
+                    "reference": "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.",
+                    "uncertainty": "None",
+                    "print_symbol": "D_{l,Cu}"
+                }
+            }
+        },
+        "alpha" : {
+            "print_name" : "$\\alpha$",
+            "eutectic_contact_angle" : {
+                "print_name": "Contact angle",
+                "value": 20.0,
+                "unit": "degrees",
+                "reference": "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.",
+                "uncertainty": "None",
+                "print_symbol": "$\\theta$"
+            },
+            "gibbs_thomson_coeff" : {
+                "print_name": "Gibbs-Thomson coefficient",
+                "value": 2.4e-7,
+                "unit": "K\\~m",
+                "reference": "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.",
+                "uncertainty": "None",
+                "print_symbol": "$\\Gamma$"
+            },
+            "liquidus_slope" : {
+                "print_name": "Liquidus slope",
+                "value": -7.67,
+                "unit": "K\\~at.\\~%",
+                "reference": "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.",
+                "uncertainty": "None",
+                "print_symbol": "$\\m$"
+            },
+            "solubility_limit" : {
+                "print_name": "Solubility limit",
+                "value": 2.48,
+                "unit": "at.\\~%",
+                "reference": "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.",
+                "uncertainty": "None",
+                "print_symbol": "$C^{E}$"
+            }
+        },
+        "theta" : {
+            "print_name" : "$\\theta$",
+            "eutectic_contact_angle" : {
+                "print_name": "Contact angle",
+                "value": 38.0,
+                "unit": "degrees",
+                "reference": "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.",
+                "uncertainty": "None",
+                "print_symbol": "$\\theta$"
+            },
+            "gibbs_thomson_coeff" : {
+                "print_name": "Gibbs-Thomson coefficient",
+                "value": 0.55e-7,
+                "unit": "K\\~m",
+                "reference": "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.",
+                "uncertainty": "None",
+                "print_symbol": "$\\Gamma$"
+            },
+            "liquidus_slope" : {
+                "print_name": "Liquidus slope",
+                "value": 5.74,
+                "unit": "K\\~at.\\~%",
+                "reference": "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.",
+                "uncertainty": "None",
+                "print_symbol": "$\\m$"
+            },
+            "solubility_limit" : {
+                "print_name": "Solubility limit",
+                "value": 31.9,
+                "unit": "at.\\~%",
+                "reference": "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.",
+                "uncertainty": "None",
+                "print_symbol": "$C^{E}$"
+            }
+        }
+    }
+}

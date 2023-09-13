@@ -3,9 +3,6 @@ import pandoc
 import os
 from enum import Enum
 
-def hello_world(string_to_print):
-    print(string_to_print)
-
 class ValueTypes(Enum):
     SCALAR = 1
     LAURENT_POLYNOMIAL = 2
@@ -52,23 +49,41 @@ class Property:
         # Check that only one type of value is defined
         assert(num_value_definitions < 2)
 
+class SinglePhase:
+    def __init__(self, name, print_name = None):
 
+        self.property_names = ['eutectic_contact_angle', 'gibbs_thomson_coeff', 'liquidus_slope','solubility_limit', 'solute_diffusivities']
 
-        
+        self.name = name
+        self.print_name = print_name
+        self.properties = {}
+       
+
 
 class MaterialInformation:
     def __init__(self, file=None):
 
-        self.property_list = ['density', 'specific_heat_solid', 'specific_heat_liquid', 'thermal_conductivity_solid', 'thermal_conductivity_liquid', 'dynamic_viscosity', 'thermal_expansion', 'latent_heat_fusion', 'latent_heat_vaporization', 'emissivity', 'molecular_mass',  'liquidus_temperature', 'log_vapor_pressure', 'laser_absorption']
+        self.thermophysical_property_names = ['density', 'specific_heat_solid', 'specific_heat_liquid', 'thermal_conductivity_solid', 'thermal_conductivity_liquid', 'dynamic_viscosity', 'thermal_expansion', 'latent_heat_fusion', 'latent_heat_vaporization', 'emissivity', 'molecular_mass',  'liquidus_temperature', 'log_vapor_pressure', 'laser_absorption', 'solidus_eutectic_temperature']
+
+        # single_phase_properties also includes solute_diffusivities, but that needs special treatment
+        self.single_phase_properties = ['eutectic_contact_angle', 'gibbs_thomson_coeff', 'liquidus_slope', 'solubility_limit', 'solute_diffusivities']
+
+        self.solidification_conditions = ['thermal_gradient', 'solidification_velocity']
+
+        self.solidification_microstructure = []
 
         self.properties = {}
+
+        self.phase_properties = {}
 
         if (file == None):
             # Set all values to None
             self.name = None
             self.notes = None
+            self.composition = None
+            self.single_phase_properties = None
 
-            for p in self.property_list:
+            for p in self.thermophysical_property_names:
                 self.properties[p] = None
 
         else:
@@ -85,8 +100,38 @@ class MaterialInformation:
             self.name = data['name']
             self.notes = data['note']
 
-            for p in self.property_list:
-                self.properties[p] = self.json_blob_to_property(data, p)
+            if ("composition" in data.keys()):
+                self.base_element = self.populate_optional_field(data["composition"], 'base_element')
+                self.solute_elements = self.populate_optional_field(data["composition"], 'solute_elements')
+
+            if ("single_phase_properties" in data.keys()):
+                self.phases = self.populate_optional_field(data["single_phase_properties"], 'phases')
+                for phase in self.phases:
+                    phase_name = phase
+                    phase_print_name = data["single_phase_properties"][phase]['print_name']
+                    single_phase = SinglePhase(phase_name, phase_print_name)
+                    for p in single_phase.property_names:
+                        if (p == "solute_diffusivities"):
+                            # This has an extra level compared to all of the other properties and so it needs to be handled seperately
+                            if (p in data["single_phase_properties"][phase].keys()):
+                                temp_dict = {}
+                                for element in self.solute_elements:
+                                    single_element_diffusivity = None
+                                    if (element in data["single_phase_properties"][phase][p].keys()):
+                                        single_element_diffusivity = self.json_blob_to_property(data["single_phase_properties"][phase][p], element)
+                                    temp_dict[element] = single_element_diffusivity
+                                single_phase.properties["solute_diffusivities"] = temp_dict   
+                                    
+                        else:
+                            if (p in data["single_phase_properties"][phase].keys()):
+                                single_phase.properties[p] = self.json_blob_to_property(data["single_phase_properties"][phase], p)
+
+                    self.phase_properties[phase] = single_phase
+
+            if ("thermophysical_properties" in data.keys()):
+                for p in self.thermophysical_property_names:
+                    if (p in data["thermophysical_properties"].keys()):
+                        self.properties[p] = self.json_blob_to_property(data["thermophysical_properties"], p)
             
         return
     
@@ -94,9 +139,9 @@ class MaterialInformation:
         tree = json_blob[property_string]
         # Mandatory fields
         name = property_string
-        unit = self.populate_optional_field(tree, 'unit')
 
         # Optional fields
+        unit = self.populate_optional_field(tree, 'unit')
         value = self.populate_optional_field(tree, 'value')
         value_laurent_poly = self.populate_optional_field(tree, 'value_laurent_poly')
         value_table = self.populate_optional_field(tree, 'value_table')
@@ -145,14 +190,14 @@ class MaterialInformation:
         with open(file, 'w') as f:
             reference_list = []
 
-            f.write("# Material Property Information: " + self.name + '\n\n')
+            f.write("# Thermophysical Properties: " + self.name + '\n\n')
             f.write("## Property Table \n")
 
             f.write("|Property | Value | Units | Data Source | \n")
             f.write("|---------| ----- | ----- | ----------- | \n")
 
             num_refs = 0
-            for p in self.property_list:
+            for p in self.thermophysical_property_names:
                 next_ref = self.properties[p].reference
                 ref_index = None
                
