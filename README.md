@@ -6,6 +6,7 @@ Mist is a Python tool for storing, sharing, and using information about material
 ## Installing Mist
 ```
 $ git clone https://code.ornl.gov/mist/mist
-$ pip install mist
+$ cd mist
+$ pip install .
 ```
 
