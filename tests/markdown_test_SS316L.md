@@ -18,7 +18,7 @@
 | Logarithm of the vapor pressure | 6.1127 + -18868.0 $T^{-1}$ | $\log(atm)$ | [1] |
 | Laser absorption | 0.36 | $-$ | - |
 | Solidus/eutecic temperature | 1670 | $K$ | [1] |
-NOTE: This file currently excludes the Surface Tension and Marangoni coefficient due to the need for function representations other than Laurent polynomials.
+NOTE: This file currently excludes the Surface Tension and Marangoni coefficient due to the need for function representations other than Laurent polynomials. Also, to be consistent with legacy data, currently the temperature dependent quantities have input in C rather than K.
 
 ## References 
 [1] C.S. Kim, Thermophysical properties of stainless steels, Argonne National Laboratory, Argonne, Illinois, 1975.

@@ -5,6 +5,34 @@
         "base_element" : "Al",
         "solute_elements" : ["Cu"]
     },
+    "solidification_microstructure" : {
+        "eutectic_lamellar_spacing": {
+            "print_name": "Eutectic lamellar spacing",
+            "value": 10.0e-9,
+            "unit": "m",
+            "reference": "Created for testing",
+            "uncertainty": "None",
+            "print_symbol": "\\lambda"
+        },
+        "phase_fractions" : {
+            "alpha": {
+                "print_name": "Phase volume fraction (\\alpha)",
+                "value": 0.9,
+                "unit": "None",
+                "reference": "Created for testing",
+                "uncertainty": "None",
+                "print_symbol": "g"
+            },
+            "theta": {
+                "print_name": "Phase volume fraction (\\theta)",
+                "value": 0.1,
+                "unit": "None",
+                "reference": "Created for testing",
+                "uncertainty": "None",
+                "print_symbol": "g_{\\theta}"
+            }
+        }
+    },
     "thermophysical_properties" : {
         "solidus_eutectic_temperature": {
             "print_name": "Solidus/eutectic temperature",

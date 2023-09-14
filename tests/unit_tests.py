@@ -73,6 +73,16 @@ class TestSuite(unittest.TestCase):
         
         assert(abs(phase_properties['theta'].properties['solubility_limit'].value - 31.9) < 1.0e-13)
 
+        # Create from the AlCu_test_in JSON file
+        path_to_example_data = os.path.join(os.path.dirname(__file__), 'AlCu_test_in.json')
+        mat = mist.core.MaterialInformation(path_to_example_data)
+        assert(mat.name == "AlCu")
+
+        s_microstructure = mat.solidification_microstructure
+        assert(abs(s_microstructure['eutectic_lamellar_spacing'].value - 10.0e-9) < 1.0e-13)
+        assert(abs(s_microstructure['phase_fractions']['alpha'].value - 0.9) < 1.0e-13)
+        assert(abs(s_microstructure['phase_fractions']['theta'].value - 0.1) < 1.0e-13)
+
 
     def test_write_markdown(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
