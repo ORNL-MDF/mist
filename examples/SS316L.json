@@ -142,5 +142,5 @@
             "print_symbol": "\\alpha"
         }
     },
-    "note": "This file currently excludes the Surface Tension and Marangoni coefficient due to the need for function representations other than Laurent polynomials."
+    "note": "This file currently excludes the Surface Tension and Marangoni coefficient due to the need for function representations other than Laurent polynomials. Also, to be consistent with legacy data, currently the temperature dependent quantities have input in C rather than K."
 }

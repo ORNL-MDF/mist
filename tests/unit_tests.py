@@ -2,11 +2,8 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-#import mist
 import unittest
-
-#from mist.core import hello_world
-import mist
+import mistlib as mist
 
 class TestSuite(unittest.TestCase):
     """Test cases."""

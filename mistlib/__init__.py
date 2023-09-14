@@ -1,1 +1,1 @@
-from mist import core
+from mistlib import core
