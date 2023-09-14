@@ -63,12 +63,15 @@ class SinglePhase:
 class MaterialInformation:
     def __init__(self, file=None):
 
+        self.composition_names = ['base_element', 'solute_elements']
+        
         self.thermophysical_property_names = ['density', 'specific_heat_solid', 'specific_heat_liquid', 'thermal_conductivity_solid', 'thermal_conductivity_liquid', 'dynamic_viscosity', 'thermal_expansion', 'latent_heat_fusion', 'latent_heat_vaporization', 'emissivity', 'molecular_mass',  'liquidus_temperature', 'log_vapor_pressure', 'laser_absorption', 'solidus_eutectic_temperature']
 
         self.solidification_condition_names = ['thermal_gradient', 'solidification_velocity']
 
         self.solidification_microstructure_names = ['eutectic_lamellar_spacing', 'phase_fractions']
 
+        self.composition = {}
         self.properties = {}
         self.phase_properties = {}
         self.solidification_conditions = {}
@@ -99,8 +102,15 @@ class MaterialInformation:
             self.notes = data['note']
 
             if ("composition" in data.keys()):
-                self.base_element = self.populate_optional_field(data["composition"], 'base_element')
-                self.solute_elements = self.populate_optional_field(data["composition"], 'solute_elements')
+                self.composition['base_element'] = self.populate_optional_field(data["composition"], 'base_element')
+                self.composition['solute_elements'] = self.populate_optional_field(data["composition"], 'solute_elements')
+              
+                if (self.composition['base_element'] in data["composition"].keys()):
+                    self.composition[self.composition['base_element']] = self.json_blob_to_property(data["composition"], self.composition['base_element'])
+                
+                for solute_element in self.composition['solute_elements']:
+                    if (solute_element in data["composition"].keys()):
+                        self.composition[solute_element] = self.json_blob_to_property(data["composition"], solute_element)
 
             if ("single_phase_properties" in data.keys()):
                 self.phases = self.populate_optional_field(data["single_phase_properties"], 'phases')
@@ -113,7 +123,7 @@ class MaterialInformation:
                             # This has an extra level compared to all of the other properties and so it needs to be handled seperately
                             if (p in data["single_phase_properties"][phase].keys()):
                                 temp_dict = {}
-                                for element in self.solute_elements:
+                                for element in self.composition['solute_elements']:
                                     single_element_diffusivity = None
                                     if (element in data["single_phase_properties"][phase][p].keys()):
                                         single_element_diffusivity = self.json_blob_to_property(data["single_phase_properties"][phase][p], element)

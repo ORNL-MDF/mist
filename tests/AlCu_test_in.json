@@ -3,7 +3,23 @@
     "note": "This file currently is focused on quantities for eutectic microstructure prediction in binary alloys.",
     "composition": {
         "base_element" : "Al",
-        "solute_elements" : ["Cu"]
+        "solute_elements" : ["Cu"],
+        "Al" : {
+            "print_name": "Composition (Al)",
+            "value": 91.0,
+            "unit": "at.\\~%",
+            "reference": "Created for testing",
+            "uncertainty": "None",
+            "print_symbol": "c_{Al}"
+        },
+        "Cu" : {
+            "print_name": "Composition (Cu)",
+            "value": 9.0,
+            "unit": "at.\\~%",
+            "reference": "Created for testing",
+            "uncertainty": "None",
+            "print_symbol": "c_{Cu}"
+        }
     },
     "solidification_microstructure" : {
         "eutectic_lamellar_spacing": {

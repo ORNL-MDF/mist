@@ -55,8 +55,8 @@ class TestSuite(unittest.TestCase):
         properties = mat.properties
         phase_properties = mat.phase_properties
 
-        assert(mat.base_element == "Al")
-        assert(mat.solute_elements == ["Cu"])
+        assert(mat.composition['base_element'] == "Al")
+        assert(mat.composition['solute_elements'] == ["Cu"])
 
         assert(properties['solidus_eutectic_temperature'].name == "solidus_eutectic_temperature")
         assert(abs(properties['solidus_eutectic_temperature'].value - 821.15) < 1.0e-13)
@@ -83,6 +83,11 @@ class TestSuite(unittest.TestCase):
         assert(abs(s_microstructure['phase_fractions']['alpha'].value - 0.9) < 1.0e-13)
         assert(abs(s_microstructure['phase_fractions']['theta'].value - 0.1) < 1.0e-13)
 
+        comp = mat.composition
+        assert(comp['base_element'] == "Al")
+        assert(comp['solute_elements'] == ['Cu'])
+        assert(abs(comp['Al'].value - 91.0) < 1.0e-13)
+        assert(abs(comp['Cu'].value - 9.0) < 1.0e-13)
 
     def test_write_markdown(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
