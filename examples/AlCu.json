@@ -13,6 +13,14 @@
             "reference": "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.",
             "uncertainty": "None",
             "print_symbol": "T_{s}"
+        },
+        "hall_petch_coefficient": {
+            "print_name": "Hall-Petch coefficient",
+            "value": 90.0e3,
+            "unit": "Pa/sqrt(m)",
+            "reference": "Michi, R. A., Sisco, K., Bahl, S. et al. Microstructural evolution and strengthening mechanisms in a heat-treated additively manufactured Al–Cu–Mn–Zr alloy. Mater. Sci. Eng. A, 840, 142928 (2022)",
+            "uncertainty": "None",
+            "print_symbol": "k_{HP}"
         }
     },
     "single_phase_properties" : {
@@ -32,6 +40,16 @@
         },
         "alpha" : {
             "print_name" : "$\\alpha$",
+            "solute_misfit_strains" : {
+                "Cu" : {
+                    "print_name": "Misfit strain (Cu in \\alpha Al)",
+                    "value": -0.0194,
+                    "unit": "None",
+                    "reference": "T. Uesugi, K. Higashi, First-principles studies on lattice constants and local lattice distortions in solid solution aluminum alloys, Computational Materials Science, 67, pp. 1-10, 2013.",
+                    "uncertainty": "None",
+                    "print_symbol": "\\epsilon_{\\alpha, Cu}"
+                }
+            },
             "eutectic_contact_angle" : {
                 "print_name": "Contact angle",
                 "value": 20.0,

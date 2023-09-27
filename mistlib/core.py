@@ -52,7 +52,7 @@ class Property:
 class SinglePhase:
     def __init__(self, name, print_name = None):
 
-        self.property_names = ['eutectic_contact_angle', 'gibbs_thomson_coeff', 'liquidus_slope','solubility_limit', 'solute_diffusivities', 'taylor_factor', 'shear_modulus_base_element', 'burgers_vector_base_element', 'poisson_ratio_base_element']
+        self.property_names = ['eutectic_contact_angle', 'gibbs_thomson_coeff', 'liquidus_slope','solubility_limit', 'solute_diffusivities', 'solute_misfit_strains', 'taylor_factor', 'shear_modulus_base_element', 'burgers_vector_base_element', 'poisson_ratio_base_element']
 
         self.name = name
         self.print_name = print_name
@@ -65,17 +65,20 @@ class MaterialInformation:
 
         self.composition_names = ['base_element', 'solute_elements']
         
-        self.thermophysical_property_names = ['density', 'specific_heat_solid', 'specific_heat_liquid', 'thermal_conductivity_solid', 'thermal_conductivity_liquid', 'dynamic_viscosity', 'thermal_expansion', 'latent_heat_fusion', 'latent_heat_vaporization', 'emissivity', 'molecular_mass',  'liquidus_temperature', 'log_vapor_pressure', 'laser_absorption', 'solidus_eutectic_temperature']
+        self.thermophysical_property_names = ['density', 'specific_heat_solid', 'specific_heat_liquid', 'thermal_conductivity_solid', 'thermal_conductivity_liquid', 'dynamic_viscosity', 'thermal_expansion', 'latent_heat_fusion', 'latent_heat_vaporization', 'emissivity', 'molecular_mass',  'liquidus_temperature', 'log_vapor_pressure', 'laser_absorption', 'solidus_eutectic_temperature', 'hall_petch_coefficient']
 
         self.solidification_condition_names = ['thermal_gradient', 'solidification_velocity']
 
         self.solidification_microstructure_names = ['eutectic_lamellar_spacing', 'phase_fractions']
+
+        self.grain_microstructure_names = ['average_grain_diameter']
 
         self.composition = {}
         self.properties = {}
         self.phase_properties = {}
         self.solidification_conditions = {}
         self.solidification_microstructure = {}
+        self.grain_microstructure = {}
 
         if (file == None):
             # Set all values to None
@@ -86,6 +89,10 @@ class MaterialInformation:
 
             for p in self.thermophysical_property_names:
                 self.properties[p] = None
+
+            self.solidification_conditions = None
+            self.solidification_microstructure = None
+            self.grain_microstructure = None
 
         else:
             # Call the load from file method
@@ -119,16 +126,16 @@ class MaterialInformation:
                     phase_print_name = data["single_phase_properties"][phase]['print_name']
                     single_phase = SinglePhase(phase_name, phase_print_name)
                     for p in single_phase.property_names:
-                        if (p == "solute_diffusivities"):
-                            # This has an extra level compared to all of the other properties and so it needs to be handled seperately
+                        if (p == "solute_diffusivities" or p == "solute_misfit_strains"):
+                            # These have an extra level compared to all of the other properties and so it needs to be handled seperately
                             if (p in data["single_phase_properties"][phase].keys()):
                                 temp_dict = {}
                                 for element in self.composition['solute_elements']:
-                                    single_element_diffusivity = None
+                                    temp_val = None
                                     if (element in data["single_phase_properties"][phase][p].keys()):
-                                        single_element_diffusivity = self.json_blob_to_property(data["single_phase_properties"][phase][p], element)
-                                    temp_dict[element] = single_element_diffusivity
-                                single_phase.properties["solute_diffusivities"] = temp_dict   
+                                        temp_val = self.json_blob_to_property(data["single_phase_properties"][phase][p], element)
+                                    temp_dict[element] = temp_val
+                                single_phase.properties[p] = temp_dict   
                                     
                         else:
                             if (p in data["single_phase_properties"][phase].keys()):
@@ -155,6 +162,11 @@ class MaterialInformation:
                                 self.solidification_microstructure[p][phase] = self.json_blob_to_property(data["solidification_microstructure"][p], phase)
                         else:
                             self.solidification_microstructure[p] = self.json_blob_to_property(data["solidification_microstructure"], p)
+
+            if ("grain_microstructure" in data.keys()):
+                for p in self.grain_microstructure_names:
+                    if (p in data["grain_microstructure"].keys()):
+                        self.grain_microstructure[p] = self.json_blob_to_property(data["grain_microstructure"], p)
             
         return
     
