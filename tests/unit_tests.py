@@ -96,6 +96,12 @@ class TestSuite(unittest.TestCase):
         file = "markdown_test_SS316L.md"
         mat.write_markdown(file)
 
+        path_to_example_data = os.path.join(os.path.dirname(__file__), 'AlCu_test_in.json')
+        mat = mist.core.MaterialInformation(path_to_example_data)
+        
+        file = "markdown_test_AlCu.md"
+        mat.write_markdown(file, ['properties', 'composition'])
+
     def test_write_pdf(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
         mat = mist.core.MaterialInformation(path_to_example_data)

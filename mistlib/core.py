@@ -220,57 +220,100 @@ class MaterialInformation:
         # TODO
         return
 
-    def write_markdown(self, file):
+    def write_markdown(self, file, tables=['properties']):
+        # TODO: Add support for the other types of properties
+        
         # Write a Markdown file with the current material information
         with open(file, 'w') as f:
             reference_list = []
-
-            f.write("# Thermophysical Properties: " + self.name + '\n\n')
-            f.write("## Property Table \n")
-
-            f.write("|Property | Value | Units | Data Source | \n")
-            f.write("|---------| ----- | ----- | ----------- | \n")
-
             num_refs = 0
-            for p in self.thermophysical_property_names:
-                next_ref = self.properties[p].reference
-                ref_index = None
-               
-                if (next_ref != None):
-                    ref_index = -1
-                    for idx, ref in enumerate(reference_list):
-                        if next_ref == ref:
-                            ref_index = idx
-                            break
+
+            f.write("# Material Properties: " + self.name + '\n\n')
+
+            if ('composition' in tables):
+                f.write("## Composition \n")
+
+                f.write("|Element | Concentration | Units | Data Source | \n")
+                f.write("|---------| ----- | ----- | ----------- | \n")
                 
-                    if ref_index == -1:
-                        ref_index = len(reference_list)
-                        reference_list.append(next_ref)
+                elements = [self.composition['base_element']]
+                elements.extend(self.composition['solute_elements'])
+                for element in elements:
+                    print_name_str = element
+                    value_str = str(self.composition[element].value)
+                    unit_str = self.composition[element].unit
 
-                print_name_str = self.properties[p].print_name   
+                    next_ref = self.composition[element].reference
+                    ref_index = None
+                
+                    if (next_ref != None):
+                        ref_index = -1
+                        for idx, ref in enumerate(reference_list):
+                            if next_ref == ref:
+                                ref_index = idx
+                                break
+                    
+                        if ref_index == -1:
+                            ref_index = len(reference_list)
+                            reference_list.append(next_ref)
 
-                value_str = None
-                if (self.properties[p].value_type == ValueTypes.SCALAR):
-                    value_str =  self.replace_none_with_string(self.properties[p].value, '-')
-                elif (self.properties[p].value_type == ValueTypes.LAURENT_POLYNOMIAL):
-                    value_str =  self.latex_laurent_poly(self.properties[p].value_laurent_poly, self.properties[p].dependent_variable_print_symbol)
-                elif (self.properties[p].value_type == ValueTypes.LAURENT_POLYNOMIAL):
-                    value_str =  self.replace_none_with_string(self.properties[p].value_table, '-')
-                else:
-                    value_str = '-'
+                    ref_str = None
+                    if (ref_index == None):
+                        ref_str = '-'
+                    else:
+                        ref_str = "[" + str(ref_index+1) + "]"
 
-                unit_str = self.replace_none_with_string(self.properties[p].unit, '-')
+                    f.write("| " + print_name_str + " | " + value_str + " | $" + unit_str + "$ | " + ref_str + " |" + "\n")
 
-                ref_str = None
-                if (ref_index == None):
-                    ref_str = '-'
-                else:
-                    ref_str = "[" + str(ref_index+1) + "]"
+            if ('properties' in tables):
+                
+                f.write("## Thermophysical Properties \n")
 
-                f.write("| " + print_name_str + " | " + value_str + " | $" + unit_str + "$ | " + ref_str + " |" + "\n")
+                f.write("|Property | Value | Units | Data Source | \n")
+                f.write("|---------| ----- | ----- | ----------- | \n")
 
-            f.write("NOTE: " + self.notes + "\n")
+                for p in self.thermophysical_property_names:
+                    if (p in self.properties.keys()):
+                        next_ref = self.properties[p].reference
+                        ref_index = None
+                    
+                        if (next_ref != None):
+                            ref_index = -1
+                            for idx, ref in enumerate(reference_list):
+                                if next_ref == ref:
+                                    ref_index = idx
+                                    break
+                        
+                            if ref_index == -1:
+                                ref_index = len(reference_list)
+                                reference_list.append(next_ref)
+
+                        print_name_str = self.properties[p].print_name   
+
+                        value_str = None
+                        if (self.properties[p].value_type == ValueTypes.SCALAR):
+                            value_str =  self.replace_none_with_string(self.properties[p].value, '-')
+                        elif (self.properties[p].value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                            value_str =  self.latex_laurent_poly(self.properties[p].value_laurent_poly, self.properties[p].dependent_variable_print_symbol)
+                        elif (self.properties[p].value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                            value_str =  self.replace_none_with_string(self.properties[p].value_table, '-')
+                        else:
+                            value_str = '-'
+
+                        unit_str = self.replace_none_with_string(self.properties[p].unit, '-')
+
+                        ref_str = None
+                        if (ref_index == None):
+                            ref_str = '-'
+                        else:
+                            ref_str = "[" + str(ref_index+1) + "]"
+
+                        f.write("| " + print_name_str + " | " + value_str + " | $" + unit_str + "$ | " + ref_str + " |" + "\n")
             f.write("\n")
+            if (self.notes is not None):
+                f.write("## Notes \n")
+                f.write(self.notes + "\n")
+                f.write("\n")
             f.write("## References \n")
             for idx, ref in enumerate(reference_list):
                 ref_str = self.replace_none_with_string(ref, '-')
