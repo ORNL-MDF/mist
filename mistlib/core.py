@@ -1,5 +1,5 @@
 import json
-import pandoc as pandoc
+import pandoc
 import os
 from enum import Enum
 
@@ -49,6 +49,12 @@ class Property:
         # Check that only one type of value is defined
         assert(num_value_definitions < 2)
 
+    def evaluate_laurent_polynomial(self, dependent_variable_value):
+        sum = 0.0
+        for term in self.value_laurent_poly:
+            sum = sum + term[0] * dependent_variable_value**term[1]
+        return sum
+
 class SinglePhase:
     def __init__(self, name, print_name = None):
 
@@ -56,9 +62,7 @@ class SinglePhase:
 
         self.name = name
         self.print_name = print_name
-        self.properties = {}
-       
-
+        self.properties = {}       
 
 class MaterialInformation:
     def __init__(self, file=None):
@@ -299,6 +303,55 @@ class MaterialInformation:
 
         return
     
+    def write_3dthesis_input(self, file, initial_temperature=None):
+         # 3DThesis/autothesis/Condor assumes at "T_0" initial temperature value. Myna populates this from Peregrine. For now we add a placeholder of -1 unless the user specifies an intial temperature.
+        if (initial_temperature == None):
+            initial_temperature = -1
+
+         # For autothesis we assume that all temperature-dependent material properties are evaluated at the solidus temperature
+        reference_temperature = self.properties["solidus_eutectic_temperature"].value
+
+        # For now the temperature in the Laurent polynomials in in C
+        reference_temperature_C = reference_temperature - 273.15
+
+        thermal_conductivity = None
+        p = self.properties["thermal_conductivity_solid"]
+        if (p.value_type == ValueTypes.SCALAR):
+            thermal_conductivity = p.value
+        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+             thermal_conductivity = p.evaluate_laurent_polynomial(reference_temperature_C)
+        else:
+            print("Error: autothesis requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes")
+
+        specific_heat = None
+        p = self.properties["specific_heat_solid"]
+        if (p.value_type == ValueTypes.SCALAR):
+            specific_heat = p.value
+        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+             specific_heat = p.evaluate_laurent_polynomial(reference_temperature_C)
+        else:
+            print("Error: autothesis requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes")
+
+        density = None
+        p = self.properties["density"]
+        if (p.value_type == ValueTypes.SCALAR):
+            density = p.value
+        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+             density = p.evaluate_laurent_polynomial(reference_temperature_C)
+        else:
+            print("Error: autothesis requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes")
+
+        with open(file, 'w') as f:
+              f.write("Constants\n")
+              f.write("{\n")
+              f.write("\t T_0\t" + str(initial_temperature) + "\n")
+              f.write("\t T_L\t" + str(self.properties["liquidus_temperature"].value) + "\n")
+              f.write("\t k\t" + str(thermal_conductivity) + "\n")
+              f.write("\t c\t" + str(specific_heat) + "\n")
+              f.write("\t p\t" + str(density) + "\n")
+              f.write("}")
+
+    
     def replace_none_with_string(self, entry, replace_string):
         if entry == None:
             return replace_string
@@ -310,5 +363,7 @@ class MaterialInformation:
         # Check if the information is complete by a user-specified standard
         # TODO
         return
+    
+    
         
 

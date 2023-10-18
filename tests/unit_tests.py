@@ -104,6 +104,22 @@ class TestSuite(unittest.TestCase):
         file = "pdf_test_SS316L.pdf"
         mat.write_pdf(file)
 
+    def test_write_3dthesis(self):
+        path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
+        mat = mist.core.MaterialInformation(path_to_example_data)
+        
+        file = "3dthesis_input.txt"
+        mat.write_3dthesis_input(file)
+
+        # I may have to do something more sophisticated in case there's roundoff error
+        expected_lines = ["Constants\n", "{\n", "\t T_0\t-1\n", "\t T_L\t1730\n", "\t k\t26.901513499999997\n", "\t c\t608.641365\n", "\t p\t7955\n", "}"]
+
+        with open(file, 'r') as f:
+            lines = f.readlines()
+            assert(lines == expected_lines)
+
+
+
 
 
 if __name__ == '__main__':
