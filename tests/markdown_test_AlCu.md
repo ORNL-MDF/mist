@@ -4,7 +4,7 @@
 |Element | Concentration | Units | Data Source | 
 |---------| ----- | ----- | ----------- | 
 | Al | 91.0 | $at. \%$ | [1] |
-| Cu | 9.0 | $at.\~\%$ | [1] |
+| Cu | 9.0 | $at. \%$ | [1] |
 ## Thermophysical Properties 
 |Property | Value | Units | Data Source | 
 |---------| ----- | ----- | ----------- | 
