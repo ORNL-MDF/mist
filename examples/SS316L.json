@@ -131,5 +131,5 @@
             "print_symbol": "\\alpha"
         }
     },
-    "note": "This file currently excludes the surface tension, marangoni coefficient, and the vapor pressure due to the need for function representations other than Laurent polynomials. Also, to be consistent with legacy data, currently the temperature dependent quantities have input in C rather than K."
+    "note": "This file currently excludes the surface tension, marangoni coefficient, and the vapor pressure due to the need for function representations other than Laurent polynomials."
 }
