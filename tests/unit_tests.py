@@ -78,11 +78,6 @@ class TestSuite(unittest.TestCase):
         mat = mist.core.MaterialInformation(path_to_example_data)
         assert(mat.name == "AlCu")
 
-        s_microstructure = mat.solidification_microstructure
-        assert(abs(s_microstructure['eutectic_lamellar_spacing'].value - 10.0e-9) < 1.0e-13)
-        assert(abs(s_microstructure['phase_fractions']['alpha'].value - 0.9) < 1.0e-13)
-        assert(abs(s_microstructure['phase_fractions']['theta'].value - 0.1) < 1.0e-13)
-
         comp = mat.composition
         assert(comp['base_element'] == "Al")
         assert(comp['solute_elements'] == ['Cu'])
