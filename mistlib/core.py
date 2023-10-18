@@ -311,15 +311,12 @@ class MaterialInformation:
          # For autothesis we assume that all temperature-dependent material properties are evaluated at the solidus temperature
         reference_temperature = self.properties["solidus_eutectic_temperature"].value
 
-        # For now the temperature in the Laurent polynomials in in C
-        reference_temperature_C = reference_temperature - 273.15
-
         thermal_conductivity = None
         p = self.properties["thermal_conductivity_solid"]
         if (p.value_type == ValueTypes.SCALAR):
             thermal_conductivity = p.value
         elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-             thermal_conductivity = p.evaluate_laurent_polynomial(reference_temperature_C)
+             thermal_conductivity = p.evaluate_laurent_polynomial(reference_temperature)
         else:
             print("Error: autothesis requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes")
 
@@ -328,7 +325,7 @@ class MaterialInformation:
         if (p.value_type == ValueTypes.SCALAR):
             specific_heat = p.value
         elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-             specific_heat = p.evaluate_laurent_polynomial(reference_temperature_C)
+             specific_heat = p.evaluate_laurent_polynomial(reference_temperature)
         else:
             print("Error: autothesis requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes")
 
@@ -337,7 +334,7 @@ class MaterialInformation:
         if (p.value_type == ValueTypes.SCALAR):
             density = p.value
         elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-             density = p.evaluate_laurent_polynomial(reference_temperature_C)
+             density = p.evaluate_laurent_polynomial(reference_temperature)
         else:
             print("Error: autothesis requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes")
 

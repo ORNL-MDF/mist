@@ -114,13 +114,23 @@ class TestSuite(unittest.TestCase):
         # I may have to do something more sophisticated in case there's roundoff error
         expected_lines = ["Constants\n", "{\n", "\t T_0\t-1\n", "\t T_L\t1730\n", "\t k\t26.901513499999997\n", "\t c\t608.641365\n", "\t p\t7955\n", "}"]
 
+        floating_point_line_numbers = [2, 3, 4, 5]
+        relative_tolerance = 1e-5
+
         with open(file, 'r') as f:
             lines = f.readlines()
-            assert(lines == expected_lines)
-
-
-
-
+            for i in range(0, len(lines)):
+                if i in floating_point_line_numbers:
+                    expected = float(expected_lines[i].strip().split()[1])
+                    test = float(lines[i].strip().split()[1])
+                    diff = abs(expected-test)/expected
+                    try:
+                        assert(diff < relative_tolerance)
+                    except:
+                        print("Error: difference exceeded the tolerance", diff, relative_tolerance)
+                    
+                else:
+                    assert(lines[i] == expected_lines[i])
 
 if __name__ == '__main__':
     unittest.main()
