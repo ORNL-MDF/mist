@@ -14,7 +14,7 @@ class TestSuite(unittest.TestCase):
         assert(prop.name == "density")
         assert(abs(prop.value - 2.0) < 1.0e-13)
         assert(prop.unit == "kg/m^3")
-        assert(prop.reference == None) 
+        assert(prop.reference == None)
         assert(prop.uncertainty == None)
         assert(prop.print_symbol == None)
 
@@ -22,7 +22,7 @@ class TestSuite(unittest.TestCase):
         assert(prop.name == "density")
         assert(abs(prop.value - 2.0) < 1.0e-13)
         assert(prop.unit == "kg/m^3")
-        assert(prop.reference == None) 
+        assert(prop.reference == None)
         assert(abs(prop.uncertainty - 1.5) < 1.0e-13)
         assert(prop.print_symbol == None)
 
@@ -36,14 +36,14 @@ class TestSuite(unittest.TestCase):
         assert(properties['density'].name == "density")
         assert(abs(properties['density'].value - 7955.0) < 1.0e-13)
         assert(properties['density'].unit == "kg/m^3")
-        assert(properties['density'].reference == "C.S. Kim, Thermophysical properties of stainless steels, Argonne National Laboratory, Argonne, Illinois, 1975.") 
+        assert(properties['density'].reference == "C.S. Kim, Thermophysical properties of stainless steels, Argonne National Laboratory, Argonne, Illinois, 1975.")
         assert(properties['density'].uncertainty == None)
         assert(properties['density'].print_symbol == "\\rho")
 
         assert(properties['liquidus_temperature'].name == "liquidus_temperature")
         assert(abs(properties['liquidus_temperature'].value - 1730.0) < 1.0e-13)
         assert(properties['liquidus_temperature'].unit == "K")
-        assert(properties['liquidus_temperature'].reference == "C.S. Kim, Thermophysical properties of stainless steels, Argonne National Laboratory, Argonne, Illinois, 1975.") 
+        assert(properties['liquidus_temperature'].reference == "C.S. Kim, Thermophysical properties of stainless steels, Argonne National Laboratory, Argonne, Illinois, 1975.")
         assert(properties['liquidus_temperature'].uncertainty == None)
         assert(properties['liquidus_temperature'].print_symbol == "T_{l}")
 
@@ -61,7 +61,7 @@ class TestSuite(unittest.TestCase):
         assert(properties['solidus_eutectic_temperature'].name == "solidus_eutectic_temperature")
         assert(abs(properties['solidus_eutectic_temperature'].value - 821.15) < 1.0e-13)
         assert(properties['solidus_eutectic_temperature'].unit == "K")
-        assert(properties['solidus_eutectic_temperature'].reference == "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.") 
+        assert(properties['solidus_eutectic_temperature'].reference == "O. Sinninger, M. Peters, P.W. Voorhees, Two-Phase Eutectic Growth in Al-Cu and Al-Cu-Ag, Metallurgical and Materials Transactions A, Vol. 49A, pp. 1692-1707, 2018.")
         assert(properties['solidus_eutectic_temperature'].uncertainty == None)
         assert(properties['solidus_eutectic_temperature'].print_symbol == "T_{s}")
 
@@ -70,7 +70,7 @@ class TestSuite(unittest.TestCase):
         assert(abs(solute_diffusivities["Cu"].value - 2.4e-9) < 1.0e-13)
 
         assert(abs(phase_properties['alpha'].properties['gibbs_thomson_coeff'].value - 2.4e-7) < 1.0e-13)
-        
+
         assert(abs(phase_properties['theta'].properties['solubility_limit'].value - 31.9) < 1.0e-13)
 
         # Create from the AlCu_test_in JSON file
@@ -87,13 +87,13 @@ class TestSuite(unittest.TestCase):
     def test_write_markdown(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
         mat = mist.core.MaterialInformation(path_to_example_data)
-        
+
         file = "markdown_test_SS316L.md"
         mat.write_markdown(file)
 
         path_to_example_data = os.path.join(os.path.dirname(__file__), 'AlCu_test_in.json')
         mat = mist.core.MaterialInformation(path_to_example_data)
-        
+
         file = "markdown_test_AlCu.md"
         mat.write_markdown(file, ['properties', 'composition'])
 
@@ -111,7 +111,7 @@ class TestSuite(unittest.TestCase):
         # Convert Md to PDF
         md2pdf(pdf_file_path, md_content)
 
-    # PDF creation from markdown_test_AlCu 
+    # PDF creation from markdown_test_AlCu
         current_dir = os.path.dirname(os.path.abspath(__file__))
         md_file_name = "markdown_test_AlCu.md"
         pdf_file_name = "pdf_test_AlCu.pdf"
@@ -136,7 +136,7 @@ class TestSuite(unittest.TestCase):
         # Assert that the file now exists
         self.assertTrue(os.path.exists(adamantine_file_path), f"File {file} should exist.")
 
-    def test_write_additivefoam(self): 
+    def test_write_additivefoam(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
         mat = mist.core.MaterialInformation(path_to_example_data)
         transport_filepath, thermo_filepath = mat.write_additivefoam_input()
@@ -149,7 +149,7 @@ class TestSuite(unittest.TestCase):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
         mat = mist.core.MaterialInformation(path_to_example_data)
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        thesis_file_path = os.path.join(current_dir, '3dthesis_input.txt') 
+        thesis_file_path = os.path.join(current_dir, '3dthesis_input.txt')
         file = "3dthesis_input.txt"
         mat.write_3dthesis_input(thesis_file_path)
 
@@ -170,7 +170,7 @@ class TestSuite(unittest.TestCase):
                         assert(diff < relative_tolerance)
                     except:
                         print("Error: difference exceeded the tolerance", diff, relative_tolerance)
-                    
+
                 else:
                     assert(lines[i] == expected_lines[i])
 

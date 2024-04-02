@@ -9,7 +9,7 @@ with open(requirement_path) as f:
 
 setup(
     name='mistlib',
-    version='0.1.0',    
+    version='0.1.0',
     description='A Python package for storing, sharing, and using information about materials in models and simulations.',
     url='https://code.ornl.gov/mist/mist',
     author='Stephen DeWitt, Gerry Knapp, Hope Spuck, Sam Reeve',

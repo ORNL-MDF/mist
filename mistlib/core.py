@@ -62,13 +62,13 @@ class SinglePhase:
 
         self.name = name
         self.print_name = print_name
-        self.properties = {}       
+        self.properties = {}
 
 class MaterialInformation:
     def __init__(self, file=None):
 
         self.composition_names = ['base_element', 'solute_elements']
-        
+
         self.thermophysical_property_names = ['density', 'specific_heat_solid', 'specific_heat_liquid', 'thermal_conductivity_solid', 'thermal_conductivity_liquid', 'dynamic_viscosity', 'thermal_expansion', 'latent_heat_fusion', 'latent_heat_vaporization', 'emissivity', 'molecular_mass',  'liquidus_temperature', 'log_vapor_pressure', 'laser_absorption', 'solidus_eutectic_temperature', 'hall_petch_coefficient']
 
         self.composition = {}
@@ -102,10 +102,10 @@ class MaterialInformation:
             if ("composition" in data.keys()):
                 self.composition['base_element'] = self.populate_optional_field(data["composition"], 'base_element')
                 self.composition['solute_elements'] = self.populate_optional_field(data["composition"], 'solute_elements')
-              
+
                 if (self.composition['base_element'] in data["composition"].keys()):
                     self.composition[self.composition['base_element']] = self.json_blob_to_property(data["composition"], self.composition['base_element'])
-                
+
                 for solute_element in self.composition['solute_elements']:
                     if (solute_element in data["composition"].keys()):
                         self.composition[solute_element] = self.json_blob_to_property(data["composition"], solute_element)
@@ -118,7 +118,7 @@ class MaterialInformation:
                     single_phase = SinglePhase(phase_name, phase_print_name)
                     for p in single_phase.property_names:
                         if (p == "solute_diffusivities" or p == "solute_misfit_strains"):
-                            # These have an extra level compared to all of the other properties and so it needs to be handled seperately
+                            # These have an extra level compared to all of the other properties and so it needs to be handled separately
                             if (p in data["single_phase_properties"][phase].keys()):
                                 temp_dict = {}
                                 for element in self.composition['solute_elements']:
@@ -126,8 +126,8 @@ class MaterialInformation:
                                     if (element in data["single_phase_properties"][phase][p].keys()):
                                         temp_val = self.json_blob_to_property(data["single_phase_properties"][phase][p], element)
                                     temp_dict[element] = temp_val
-                                single_phase.properties[p] = temp_dict   
-                                    
+                                single_phase.properties[p] = temp_dict
+
                         else:
                             if (p in data["single_phase_properties"][phase].keys()):
                                 single_phase.properties[p] = self.json_blob_to_property(data["single_phase_properties"][phase], p)
@@ -138,9 +138,9 @@ class MaterialInformation:
                 for p in self.thermophysical_property_names:
                     if (p in data["thermophysical_properties"].keys()):
                         self.properties[p] = self.json_blob_to_property(data["thermophysical_properties"], p)
-            
+
         return
-    
+
     def json_blob_to_property(self, json_blob, property_string):
         tree = json_blob[property_string]
         # Mandatory fields
@@ -162,7 +162,7 @@ class MaterialInformation:
         property = Property(name, unit, value, value_laurent_poly, value_table, dependent_variable_print_name, dependent_variable_print_symbol, dependent_variable_unit, print_name, reference, uncertainty, print_symbol)
 
         return property
-    
+
     def populate_optional_field(self, json_blob, field_key):
         val = None
         if field_key in json_blob:
@@ -171,7 +171,7 @@ class MaterialInformation:
                 val = None
 
         return val
-    
+
     def latex_laurent_poly(self, value_laurent_poly, dependent_variable_print_symbol):
         latex_str = ""
         for term in value_laurent_poly:
@@ -181,7 +181,7 @@ class MaterialInformation:
                 latex_str = latex_str + str(term[0]) + " $" + dependent_variable_print_symbol + "$ + "
             else:
                 latex_str = latex_str + str(term[0]) + " $" + dependent_variable_print_symbol + "^{" + str(term[1]) + "}$ + "
-        
+
         latex_str = latex_str.rstrip("+ ")
 
         return latex_str
@@ -193,7 +193,7 @@ class MaterialInformation:
 
     def write_markdown(self, file, tables=['properties']):
         # TODO: Add support for the other types of properties
-        
+
         # Write a Markdown file with the current material information
         with open(file, 'w') as f:
             reference_list = []
@@ -206,7 +206,7 @@ class MaterialInformation:
 
                 f.write("|Element | Concentration | Units | Data Source | \n")
                 f.write("|---------| ----- | ----- | ----------- | \n")
-                
+
                 elements = [self.composition['base_element']]
                 elements.extend(self.composition['solute_elements'])
                 for element in elements:
@@ -216,14 +216,14 @@ class MaterialInformation:
 
                     next_ref = self.composition[element].reference
                     ref_index = None
-                
+
                     if (next_ref != None):
                         ref_index = -1
                         for idx, ref in enumerate(reference_list):
                             if next_ref == ref:
                                 ref_index = idx
                                 break
-                    
+
                         if ref_index == -1:
                             ref_index = len(reference_list)
                             reference_list.append(next_ref)
@@ -237,7 +237,7 @@ class MaterialInformation:
                     f.write("| " + print_name_str + " | " + value_str + " | $" + unit_str + "$ | " + ref_str + " |" + "\n")
 
             if ('properties' in tables):
-                
+
                 f.write("## Thermophysical Properties \n")
 
                 f.write("|Property | Value | Units | Data Source | \n")
@@ -247,19 +247,19 @@ class MaterialInformation:
                     if (p in self.properties.keys()):
                         next_ref = self.properties[p].reference
                         ref_index = None
-                    
+
                         if (next_ref != None):
                             ref_index = -1
                             for idx, ref in enumerate(reference_list):
                                 if next_ref == ref:
                                     ref_index = idx
                                     break
-                        
+
                             if ref_index == -1:
                                 ref_index = len(reference_list)
                                 reference_list.append(next_ref)
 
-                        print_name_str = self.properties[p].print_name   
+                        print_name_str = self.properties[p].print_name
 
                         value_str = None
                         if (self.properties[p].value_type == ValueTypes.SCALAR):
@@ -290,9 +290,9 @@ class MaterialInformation:
                 ref_str = self.replace_none_with_string(ref, '-')
                 f.write("["+ str(idx+1) +"] " + ref_str + "\n")
                 f.write("\n")
-        
+
         return
-        
+
     def write_pdf(self, file):
         # Write a PDF file with the current material information
         temp_md_file = "temp.md"
@@ -302,7 +302,7 @@ class MaterialInformation:
         os.remove(temp_md_file)
 
         return
-    
+
     def write_adamantine_input(self, file):
         reference_temperature = self.properties["solidus_eutectic_temperature"].value # For adamantine we assume that all temperature-dependent material properties are evaluated at the solidus temperature
         code_name = "adamantine"
@@ -313,7 +313,7 @@ class MaterialInformation:
         density = self.get_property("density",  code_name, reference_temperature)
         thermal_conductivity_2 = self.get_property("thermal_conductivity_liquid", code_name, reference_temperature)
         emissivity = self.get_property("emissivity", code_name, reference_temperature)
-        
+
         content = (
             f"materials\n{{"
             f"\n\tn_material 1"
@@ -341,12 +341,9 @@ class MaterialInformation:
             f"\n\tlatent heat {self.properties['latent_heat_fusion'].value} ;"
             f"\n\t}}"
             f"\n}}"
-        ) 
+        )
         with open(file, 'w') as f:
              f.write(content)
-        
-       
-        return    
 
     def append_file(input_filename, output_filename):
         # Get current directory of the script
@@ -363,7 +360,7 @@ class MaterialInformation:
             # Append the content to the output file
             with open(output_file_path, 'a') as output_file:
                 output_file.write(input_content)
-    
+
             return
 
     def write_additivefoam_transportProp(self, file="transportProperties"):
@@ -400,7 +397,7 @@ class MaterialInformation:
             else:
                 print(f"Warning: converting scalar into polynomial.")
                 return f"\t{variable_name}\t({p.value}\t0.0\t0.0);\n"
-        
+
         content = comment_block
 
         content += "solid\n{\n"
@@ -432,20 +429,20 @@ class MaterialInformation:
             f.write(content)
         return file
 
-    def write_additivefoam_thermoPath(self, file="thermoPath"):        
+    def write_additivefoam_thermoPath(self, file="thermoPath"):
         with open(file, "w") as g:
             eutectic_temp = self.properties["solidus_eutectic_temperature"].value
             liquidus_temp = self.properties["liquidus_temperature"].value
             g.write (f"(\n{eutectic_temp:.4f}\t 1.0000 \n{liquidus_temp:.4f}\t 0.0000\n)")
         return file
-    
+
     def write_additivefoam_input(self, transport_file="transportProperties", thermo_file="thermoPath"):
         self.write_additivefoam_transportProp(file=transport_file)
         self.write_additivefoam_thermoPath(file=thermo_file)
         return [transport_file, thermo_file]
 
     def write_3dthesis_input(self, file, initial_temperature=None):
-         # 3DThesis/autothesis/Condor assumes at "T_0" initial temperature value. Myna populates this from Peregrine. For now we add a placeholder of -1 unless the user specifies an intial temperature.
+         # 3DThesis/autothesis/Condor assumes at "T_0" initial temperature value. Myna populates this from Peregrine. For now we add a placeholder of -1 unless the user specifies an initial temperature.
         if (initial_temperature == None):
             initial_temperature = -1
 
@@ -455,7 +452,7 @@ class MaterialInformation:
         thermal_conductivity = self.get_property("thermal_conductivity_solid", code_name, reference_temperature)
         density = self.get_property("density", code_name, reference_temperature)
         specific_heat = self.get_property("specific_heat_solid", code_name, reference_temperature)
-        
+
         content_to_write = (
                 "Constants\n"
                 "{\n"
@@ -465,7 +462,7 @@ class MaterialInformation:
                 f"\t c\t{specific_heat}\n"
                 f"\t p\t{density}\n"
                 "}"
-            ) 
+            )
         with open(file, 'w') as f:
             f.write(content_to_write)
 
@@ -485,8 +482,8 @@ class MaterialInformation:
             return replace_string
         else:
             return str(entry)
-       
-        
+
+
     def validate_completeness(self):
         # Check if the information is complete by a user-specified standard
         # TODO

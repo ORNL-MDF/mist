@@ -1,8 +1,8 @@
 # Material Properties: SS316L
 
-## Thermophysical Properties 
-|Property | Value | Units | Data Source | 
-|---------| ----- | ----- | ----------- | 
+## Thermophysical Properties
+|Property | Value | Units | Data Source |
+|---------| ----- | ----- | ----------- |
 | Density at 298 K | 7955 | $kg/m^3$ | [1] |
 | Specific heat capacity (solid) | 386.7 + 0.1329 $T$ | $J/(kg~K)$ | [1] |
 | Specific heat capacity (liquid) | 770.4 | $J/(kg~K)$ | [1] |
@@ -18,9 +18,8 @@
 | Laser absorption | 0.36 | $-$ | - |
 | Solidus/eutecic temperature | 1670 | $K$ | [1] |
 
-## Notes 
+## Notes
 This file currently excludes the surface tension, marangoni coefficient, and the vapor pressure due to the need for function representations other than Laurent polynomials.
 
-## References 
+## References
 [1] C.S. Kim, Thermophysical properties of stainless steels, Argonne National Laboratory, Argonne, Illinois, 1975.
-
