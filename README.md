@@ -9,3 +9,6 @@ $ cd mist
 $ pip install .
 ```
 
+## License
+
+Mist is distributed under an [open source BSD 3-Clause license](LICENSE.md).
