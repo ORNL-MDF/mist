@@ -7,7 +7,7 @@ setup(
     url='https://code.ornl.gov/mist/mist',
     author='Stephen DeWitt',
     author_email='dewittsj@ornl.gov',
-    license='ORNL Internal Software - Currently unlicensed',
+    license='BSD 3-Clause',
     packages=['mistlib'],
     install_requires=['pandoc',              
                       ],
@@ -16,5 +16,6 @@ setup(
         'Development Status :: 1 - Planning',
         'Intended Audience :: Science/Research',
         'Programming Language :: Python :: 3',
+        'License :: OSI Approved :: BSD License'
     ],
 )
