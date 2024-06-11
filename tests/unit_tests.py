@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
+from md2pdf.core import md2pdf
 import unittest
 import mistlib as mist
 
@@ -98,11 +98,14 @@ class TestSuite(unittest.TestCase):
         mat.write_markdown(file, ['properties', 'composition'])
 
     def test_write_pdf(self):
-        path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
-        mat = mist.core.MaterialInformation(path_to_example_data)
-        
-        file = "pdf_test_SS316L.pdf"
-        mat.write_pdf(file)
+        # Read Markdown content from file
+        md_file = "markdown_test_AlCu.md"
+        with open(md_file, "r") as f:
+            md_content = f.read()
+
+        # Convert Markdown to PDF using md2pdf
+        pdf_file = "pdf_test_AlCu.pdf"
+        md2pdf(pdf_file, md_content)
 
     def test_write_3dthesis(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
