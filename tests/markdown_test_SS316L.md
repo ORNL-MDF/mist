@@ -19,7 +19,7 @@
 | Solidus/eutecic temperature | 1670 | $K$ | [1] |
 
 ## Notes 
-This file currently excludes the surface tension, marangoni coefficient, and the vapor pressure due to the need for function representations other than Laurent polynomials. Also, to be consistent with legacy data, currently the temperature dependent quantities have input in C rather than K.
+This file currently excludes the surface tension, marangoni coefficient, and the vapor pressure due to the need for function representations other than Laurent polynomials.
 
 ## References 
 [1] C.S. Kim, Thermophysical properties of stainless steels, Argonne National Laboratory, Argonne, Illinois, 1975.
