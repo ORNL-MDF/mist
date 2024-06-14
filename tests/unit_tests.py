@@ -99,18 +99,23 @@ class TestSuite(unittest.TestCase):
 
     def test_write_pdf(self):
         # Read Markdown content from file
-        md_file = "markdown_test_AlCu.md"
-        with open(md_file, "r") as f:
-            md_content = f.read()
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        md_file_name = "markdown_test_AlCu.md"
+        pdf_file_name = "pdf_test_AlCu.pdf"
 
-        # Convert Markdown to PDF using md2pdf
-        pdf_file = "pdf_test_AlCu.pdf"
-        md2pdf(pdf_file, md_content)
+    # Construct full file paths
+        md_file_path = os.path.join(current_dir, 'md_file_name')
+        pdf_file_path = os.path.join(current_dir, pdf_file_name)
+        with open(md_file_name, "r") as f:
+                md_content = f.read()
+            
+            # Convert Markdown to PDF using md2pdf
+        md2pdf(pdf_file_path, md_content)
 
     def test_write_3dthesis(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
         mat = mist.core.MaterialInformation(path_to_example_data)
-        
+         
         file = "3dthesis_input.txt"
         mat.write_3dthesis_input(file)
 
