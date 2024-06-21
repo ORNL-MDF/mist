@@ -98,26 +98,38 @@ class TestSuite(unittest.TestCase):
         mat.write_markdown(file, ['properties', 'composition'])
 
     def test_write_pdf(self):
-        # Read Markdown content from file
+    # Read Markdown content from file
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        md_file_name = "markdown_test_AlCu.md"
-        pdf_file_name = "pdf_test_AlCu.pdf"
+        md_file_name = "markdown_test_SS316L.md"
+        pdf_file_name = "pdf_test_SS316L.pdf"
 
     # Construct full file paths
         md_file_path = os.path.join(current_dir, 'md_file_name')
         pdf_file_path = os.path.join(current_dir, pdf_file_name)
         with open(md_file_name, "r") as f:
                 md_content = f.read()
-            
-            # Convert Markdown to PDF using md2pdf
+    # Convert Md to PDF
+        md2pdf(pdf_file_path, md_content)
+
+    # Test for AlCu   
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        md_file_name = "markdown_test_AlCu.md"
+        pdf_file_name = "pdf_test_AlCu.pdf"
+
+        md_file_path = os.path.join(current_dir, 'md_file_name')
+        pdf_file_path = os.path.join(current_dir, pdf_file_name)
+        with open(md_file_name, "r") as f:
+                md_content = f.read()
+    # Convert Markdown to PDF using md2pdf
         md2pdf(pdf_file_path, md_content)
 
     def test_write_3dthesis(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
         mat = mist.core.MaterialInformation(path_to_example_data)
-         
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        thesis_file_path = os.path.join(current_dir, '3dthesis_input.txt') 
         file = "3dthesis_input.txt"
-        mat.write_3dthesis_input(file)
+        mat.write_3dthesis_input(thesis_file_path)
 
         # I may have to do something more sophisticated in case there's roundoff error
         expected_lines = ["Constants\n", "{\n", "\t T_0\t-1\n", "\t T_L\t1730\n", "\t k\t26.901513499999997\n", "\t c\t608.641365\n", "\t p\t7955\n", "}"]
@@ -125,7 +137,7 @@ class TestSuite(unittest.TestCase):
         floating_point_line_numbers = [2, 3, 4, 5]
         relative_tolerance = 1e-5
 
-        with open(file, 'r') as f:
+        with open(thesis_file_path, 'r') as f:
             lines = f.readlines()
             for i in range(0, len(lines)):
                 if i in floating_point_line_numbers:
