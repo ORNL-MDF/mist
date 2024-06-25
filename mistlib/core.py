@@ -380,7 +380,27 @@ class MaterialInformation:
                 f.write(f"\tliquidus {self.properties['liquidus_temperature'].value} ;\n")
                 f.write(f"\tlatent heat {self.properties['latent_heat_fusion'].value} ;\n\t\t}}\n}}")
 
+    def append_file(input_filename, output_filename):
+        # Get current directory of the script
+        current_dir = os.path.dirname(os.path.abspath(__file__))
 
+        # Form paths
+        input_file_path = os.path.join(current_dir, input_filename)
+        output_file_path = os.path.join(current_dir, output_filename)
+
+        # Read the input file
+        with open(input_file_path, 'r') as input_file:
+            input_content = input_file.read()
+
+        # Append the content to the output file
+        with open(output_file_path, 'a') as output_file:
+            output_file.write(input_content)
+
+
+            input_file = 'mistinput.info'  
+            output_file = '../inputfiles/input.info'
+    append_file(input_file, output_file)
+            
     def write_3dthesis_input(self, file, initial_temperature=None):
          # 3DThesis/autothesis/Condor assumes at "T_0" initial temperature value. Myna populates this from Peregrine. For now we add a placeholder of -1 unless the user specifies an intial temperature.
         if (initial_temperature == None):

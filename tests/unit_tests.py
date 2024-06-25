@@ -123,7 +123,16 @@ class TestSuite(unittest.TestCase):
     # Convert Markdown to PDF using md2pdf
         md2pdf(pdf_file_path, md_content)
 
-    def test_write_3dthesis(self):
+def test_write_adamantine(self):
+            path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
+            mat = mist.core.MaterialInformation(path_to_example_data)
+            
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            file = "mistinput.info"
+            adamantine_file_path = os.path.join(current_dir, 'mistinput.info')
+            mat.write_adamantine_input(adamantine_file_path) # this and ^^ save the file to the tests directory
+
+def test_write_3dthesis(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
         mat = mist.core.MaterialInformation(path_to_example_data)
         current_dir = os.path.dirname(os.path.abspath(__file__))
