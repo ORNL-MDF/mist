@@ -303,6 +303,84 @@ class MaterialInformation:
 
         return
     
+        def write_adamantine_input(self, file):
+            reference_temperature = self.properties["solidus_eutectic_temperature"].value #this was done for 3dthesis writer prbably can be removed?
+
+            p = self.properties["specific_heat_solid"]
+            if (p.value_type == ValueTypes.SCALAR):
+                specific_heat_1 = p.value
+            elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                specific_heat_1 = p.evaluate_laurent_polynomial(reference_temperature)
+            else:
+                print("Error")
+
+            p = self.properties["specific_heat_liquid"]
+            if (p.value_type == ValueTypes.SCALAR):
+                specific_heat_2 = p.value
+            elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                specific_heat_2 = p.evaluate_laurent_polynomail(reference_temperature)
+            else:
+                print("Error")
+
+            p = self.properties["thermal_conductivity_solid"]
+            if (p.value_type == ValueTypes.SCALAR):
+                thermal_conductivity_1 = p.value
+            elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                thermal_conductivity_1 = p.evaluate_laurent_polynomial(reference_temperature)
+            else:
+                print("Error")
+
+            density = None
+            p = self.properties["density"]
+            if p.value_type == ValueTypes.SCALAR:
+                density = p.value
+            elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
+                density = p.evaluate_laurent_polynomial(reference_temperature)
+            else:
+                print("Error")
+
+            thermal_conductivity = None
+            p = self.properties["thermal_conductivity_liquid"]
+            if p.value_type == ValueTypes.SCALAR:
+                thermal_conductivity_2 = p.value
+            elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
+                thermal_conductivity_2 = p.evaluate_laurent_polynomial(reference_temperature)
+            else:
+                print("Error")
+
+            emissivity = None
+            p = self.properties["emissivity"]
+            if p.value_type == ValueTypes.SCALAR:
+                emissivity = p.value
+            elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
+                emissivity = p.evaluate_laurent_polynomials(reference_temperature)
+            else:
+                print("Error")
+
+        with open(file, 'w') as f:
+                f.write("materials\n{")
+                f.write(f"\n\tn_material 1\n")
+                f.write("\n\tproperty_format polynomial\n")  # This may need to be dynamic
+                f.write("\n\tmaterial_0\n\t{\n")
+                f.write("\t\tsolid\n\t\t{\n")
+                f.write(f"\t\t\tdensity {density} ;\n") 
+                f.write(f"\t\t\tspecific_heat {specific_heat_1} ;\n")  
+                f.write(f"\t\t\tthermal_conductivity_x {thermal_conductivity_1} ;\n") 
+                f.write(f"\t\t\tthermal_conductivity_z {thermal_conductivity_1} ;\n")
+                f.write(f"\t\t\temissivity {emissivity} ; \n")
+                f.write("\t\t}\n")
+                f.write("\t\tliquid\n\t\t{\n")
+                f.write(f"\t\t\tdensity {density} ;\n")
+                f.write(f"\t\t\tspecific_heat {specific_heat_1} ;\n")
+                f.write(f"\t\t\tthermal_conductivity_x {thermal_conductivity_2} ;\n")
+                f.write(f"\t\t\tthermal_conductivity_z {thermal_conductivity_2} ;\n")
+                f.write(f"\t\t\temissivity {emissivity} ; \n")
+                f.write("\t\t}\n")
+                f.write(f"\tsolidus {self.properties['solidus_eutectic_temperature'].value} ;\n")
+                f.write(f"\tliquidus {self.properties['liquidus_temperature'].value} ;\n")
+                f.write(f"\tlatent heat {self.properties['latent_heat_fusion'].value} ;\n\t\t}}\n}}")
+
+
     def write_3dthesis_input(self, file, initial_temperature=None):
          # 3DThesis/autothesis/Condor assumes at "T_0" initial temperature value. Myna populates this from Peregrine. For now we add a placeholder of -1 unless the user specifies an intial temperature.
         if (initial_temperature == None):
