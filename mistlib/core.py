@@ -304,7 +304,7 @@ class MaterialInformation:
         return
     
     def write_adamantine_input(self, file):
-        reference_temperature = self.properties["solidus_eutectic_temperature"].value #this was done for 3dthesis writer prbably can be removed?
+        reference_temperature = self.properties["solidus_eutectic_temperature"].value # For adamantine we assume that all temperature-dependent material properties are evaluated at the solidus temperature
 
         p = self.properties["specific_heat_solid"]
         if (p.value_type == ValueTypes.SCALAR):
@@ -312,15 +312,15 @@ class MaterialInformation:
         elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
                 specific_heat_1 = p.evaluate_laurent_polynomial(reference_temperature)
         else:
-                print("Error")
+                print("Error: adamantine requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.")
 
         p = self.properties["specific_heat_liquid"]
         if (p.value_type == ValueTypes.SCALAR):
                 specific_heat_2 = p.value
         elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-                specific_heat_2 = p.evaluate_laurent_polynomail(reference_temperature)
+                specific_heat_2 = p.evaluate_laurent_polynomial(reference_temperature)
         else:
-                print("Error")
+                print("Error: adamantine requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.")
 
         p = self.properties["thermal_conductivity_solid"]
         if (p.value_type == ValueTypes.SCALAR):
@@ -328,7 +328,7 @@ class MaterialInformation:
         elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
                 thermal_conductivity_1 = p.evaluate_laurent_polynomial(reference_temperature)
         else:
-                print("Error")
+                print("Error: adamantine requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.")
 
         density = None
         p = self.properties["density"]
@@ -337,7 +337,7 @@ class MaterialInformation:
         elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
                 density = p.evaluate_laurent_polynomial(reference_temperature)
         else:
-                print("Error")
+                print("Error: adamantine requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.")
 
         thermal_conductivity = None
         p = self.properties["thermal_conductivity_liquid"]
@@ -346,7 +346,7 @@ class MaterialInformation:
         elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
                 thermal_conductivity_2 = p.evaluate_laurent_polynomial(reference_temperature)
         else:
-                print("Error")
+                print("Error: adamantine requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.")
 
         emissivity = None
         p = self.properties["emissivity"]
@@ -355,7 +355,7 @@ class MaterialInformation:
         elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
                 emissivity = p.evaluate_laurent_polynomials(reference_temperature)
         else:
-                print("Error")
+                print("Error: adamantine requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.")
 
         with open(file, 'w') as f:
                 f.write("materials\n{")
@@ -379,6 +379,8 @@ class MaterialInformation:
                 f.write(f"\tsolidus {self.properties['solidus_eutectic_temperature'].value} ;\n")
                 f.write(f"\tliquidus {self.properties['liquidus_temperature'].value} ;\n")
                 f.write(f"\tlatent heat {self.properties['latent_heat_fusion'].value} ;\n\t\t}}\n}}")
+       
+        return    
 
     def append_file(input_filename, output_filename):
         # Get current directory of the script
@@ -395,6 +397,8 @@ class MaterialInformation:
             # Append the content to the output file
             with open(output_file_path, 'a') as output_file:
                 output_file.write(input_content)
+    
+            return
 
     def write_3dthesis_input(self, file, initial_temperature=None):
          # 3DThesis/autothesis/Condor assumes at "T_0" initial temperature value. Myna populates this from Peregrine. For now we add a placeholder of -1 unless the user specifies an intial temperature.
@@ -441,14 +445,14 @@ class MaterialInformation:
               f.write("\t p\t" + str(density) + "\n")
               f.write("}")
 
-    
+
     def replace_none_with_string(self, entry, replace_string):
         if entry == None:
             return replace_string
         else:
             return str(entry)
+       
         
-
     def validate_completeness(self):
         # Check if the information is complete by a user-specified standard
         # TODO

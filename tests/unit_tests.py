@@ -98,20 +98,20 @@ class TestSuite(unittest.TestCase):
         mat.write_markdown(file, ['properties', 'composition'])
 
     def test_write_pdf(self):
-    # Read Markdown content from file
+    # PDF creation from markdown_test_SS316L
         current_dir = os.path.dirname(os.path.abspath(__file__))
         md_file_name = "markdown_test_SS316L.md"
         pdf_file_name = "pdf_test_SS316L.pdf"
 
-    # Construct full file paths
+        # Construct full file paths
         md_file_path = os.path.join(current_dir, 'md_file_name')
         pdf_file_path = os.path.join(current_dir, pdf_file_name)
         with open(md_file_name, "r") as f:
                 md_content = f.read()
-    # Convert Md to PDF
+        # Convert Md to PDF
         md2pdf(pdf_file_path, md_content)
 
-    # Test for AlCu   
+    # PDF creation from markdown_test_AlCu 
         current_dir = os.path.dirname(os.path.abspath(__file__))
         md_file_name = "markdown_test_AlCu.md"
         pdf_file_name = "pdf_test_AlCu.pdf"
@@ -120,7 +120,7 @@ class TestSuite(unittest.TestCase):
         pdf_file_path = os.path.join(current_dir, pdf_file_name)
         with open(md_file_name, "r") as f:
                 md_content = f.read()
-    # Convert Markdown to PDF using md2pdf
+        # Convert Markdown to PDF using md2pdf
         md2pdf(pdf_file_path, md_content)
 
     def test_write_adamantine(self):
@@ -139,7 +139,7 @@ class TestSuite(unittest.TestCase):
         except AssertionError as e:
             self.fail(f"AssertionError occurred: {str(e)}")
 
-def test_write_3dthesis(self):
+    def test_write_3dthesis(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
         mat = mist.core.MaterialInformation(path_to_example_data)
         current_dir = os.path.dirname(os.path.abspath(__file__))
