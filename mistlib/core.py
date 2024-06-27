@@ -303,58 +303,58 @@ class MaterialInformation:
 
         return
     
-        def write_adamantine_input(self, file):
-            reference_temperature = self.properties["solidus_eutectic_temperature"].value #this was done for 3dthesis writer prbably can be removed?
+    def write_adamantine_input(self, file):
+        reference_temperature = self.properties["solidus_eutectic_temperature"].value #this was done for 3dthesis writer prbably can be removed?
 
-            p = self.properties["specific_heat_solid"]
-            if (p.value_type == ValueTypes.SCALAR):
+        p = self.properties["specific_heat_solid"]
+        if (p.value_type == ValueTypes.SCALAR):
                 specific_heat_1 = p.value
-            elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
                 specific_heat_1 = p.evaluate_laurent_polynomial(reference_temperature)
-            else:
+        else:
                 print("Error")
 
-            p = self.properties["specific_heat_liquid"]
-            if (p.value_type == ValueTypes.SCALAR):
+        p = self.properties["specific_heat_liquid"]
+        if (p.value_type == ValueTypes.SCALAR):
                 specific_heat_2 = p.value
-            elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
                 specific_heat_2 = p.evaluate_laurent_polynomail(reference_temperature)
-            else:
+        else:
                 print("Error")
 
-            p = self.properties["thermal_conductivity_solid"]
-            if (p.value_type == ValueTypes.SCALAR):
+        p = self.properties["thermal_conductivity_solid"]
+        if (p.value_type == ValueTypes.SCALAR):
                 thermal_conductivity_1 = p.value
-            elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
                 thermal_conductivity_1 = p.evaluate_laurent_polynomial(reference_temperature)
-            else:
+        else:
                 print("Error")
 
-            density = None
-            p = self.properties["density"]
-            if p.value_type == ValueTypes.SCALAR:
+        density = None
+        p = self.properties["density"]
+        if p.value_type == ValueTypes.SCALAR:
                 density = p.value
-            elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
+        elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
                 density = p.evaluate_laurent_polynomial(reference_temperature)
-            else:
+        else:
                 print("Error")
 
-            thermal_conductivity = None
-            p = self.properties["thermal_conductivity_liquid"]
-            if p.value_type == ValueTypes.SCALAR:
+        thermal_conductivity = None
+        p = self.properties["thermal_conductivity_liquid"]
+        if p.value_type == ValueTypes.SCALAR:
                 thermal_conductivity_2 = p.value
-            elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
+        elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
                 thermal_conductivity_2 = p.evaluate_laurent_polynomial(reference_temperature)
-            else:
+        else:
                 print("Error")
 
-            emissivity = None
-            p = self.properties["emissivity"]
-            if p.value_type == ValueTypes.SCALAR:
+        emissivity = None
+        p = self.properties["emissivity"]
+        if p.value_type == ValueTypes.SCALAR:
                 emissivity = p.value
-            elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
+        elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
                 emissivity = p.evaluate_laurent_polynomials(reference_temperature)
-            else:
+        else:
                 print("Error")
 
         with open(file, 'w') as f:
@@ -382,25 +382,20 @@ class MaterialInformation:
 
     def append_file(input_filename, output_filename):
         # Get current directory of the script
-        current_dir = os.path.dirname(os.path.abspath(__file__))
+            current_dir = os.path.dirname(os.path.abspath(__file__))
 
-        # Form paths
-        input_file_path = os.path.join(current_dir, input_filename)
-        output_file_path = os.path.join(current_dir, output_filename)
+            # Form paths
+            input_file_path = os.path.join(current_dir, input_filename)
+            output_file_path = os.path.join(current_dir, output_filename)
 
-        # Read the input file
-        with open(input_file_path, 'r') as input_file:
-            input_content = input_file.read()
+            # Read the input file
+            with open(input_file_path, 'r') as input_file:
+                input_content = input_file.read()
 
-        # Append the content to the output file
-        with open(output_file_path, 'a') as output_file:
-            output_file.write(input_content)
+            # Append the content to the output file
+            with open(output_file_path, 'a') as output_file:
+                output_file.write(input_content)
 
-
-            input_file = 'mistinput.info'  
-            output_file = '../inputfiles/input.info'
-    append_file(input_file, output_file)
-            
     def write_3dthesis_input(self, file, initial_temperature=None):
          # 3DThesis/autothesis/Condor assumes at "T_0" initial temperature value. Myna populates this from Peregrine. For now we add a placeholder of -1 unless the user specifies an intial temperature.
         if (initial_temperature == None):
