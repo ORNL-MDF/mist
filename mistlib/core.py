@@ -399,6 +399,80 @@ class MaterialInformation:
                 output_file.write(input_content)
     
             return
+    
+    def write_additivefoam_input(self, file):
+        specific_heat_1 = None
+        specific_heat_2 = None
+        # Reference temperature based on a property from self.properties
+        comment_block = """/*---------------------------------------------------------------------------
+     AdditiveFOAM template input file (compatible with 1.0, OpenFOAM 10)
+
+                      Created for simulation with Myna
+  ---------------------------------------------------------------------------*/
+  FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      transportProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+"""
+
+        reference_temperature = self.properties["solidus_eutectic_temperature"].value
+        p=(self.properties["thermal_conductivity_solid"].value_laurent_poly)
+        labeled_values = {}
+        for idx, pair in enumerate(p, 1):
+            label = f"thermal_cond_S{idx}" 
+            first_value = pair[0]
+            labeled_values[label] = first_value
+       
+        a = []
+        for label, value in labeled_values.items():
+            a.append(value)
+            print(f"{value}")
+        p=(self.properties["thermal_conductivity_liquid"].value_laurent_poly)
+        first_values = [pair[0] for pair in p]
+        labeled_values = {}
+        for idx, pair in enumerate(p, 1):
+            label = f"thermal_cond_S{idx}" 
+            first_value = pair[0]
+            labeled_values[label] = first_value
+        
+        b = []
+        for label, value in labeled_values.items():
+            b.append(value)
+            print(f"{value}")
+
+        p = self.properties["specific_heat_solid"]
+        if (p.value_type == ValueTypes.SCALAR):
+                specific_heat_1 = p.value
+        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                specific_heat_1 = p.evaluate_laurent_polynomial(reference_temperature)
+        else:
+                print("Error: ValueType not supported")
+
+        p = self.properties["specific_heat_liquid"]
+        if (p.value_type == ValueTypes.SCALAR):
+                specific_heat_2 = p.value
+        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                specific_heat_2 = p.evaluate_laurent_polynomial(reference_temperature)
+        else:
+                print("Error: ValueType not supported")
+        
+        with open(file, "w") as f:
+            f.write(comment_block)
+            f.write("solid\n{\n")
+            f.write(f"\tkappa\t ({a[0]} {a[1]} 0.0);\n") 
+            f.write(f"\tCp\t\t ({specific_heat_1} 0.0 0.0);\n")
+            f.write("}\n\n")
+            
+            f.write("liquid\n{\n")
+            f.write(f"\tkappa\t ({b[0]} {b[1]} 0.0);\n") 
+            f.write(f"\tCp\t\t ({specific_heat_2} 0.0 0.0);\n")
+            f.write("}\n")
 
     def write_3dthesis_input(self, file, initial_temperature=None):
          # 3DThesis/autothesis/Condor assumes at "T_0" initial temperature value. Myna populates this from Peregrine. For now we add a placeholder of -1 unless the user specifies an intial temperature.
