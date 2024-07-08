@@ -139,19 +139,31 @@ class TestSuite(unittest.TestCase):
         except AssertionError as e:
             self.fail(f"AssertionError occurred: {str(e)}")
 
-    def test_write_additivefoam(self): 
+    def test_write_additivefoam_transportProp(self): 
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json') 
         mat = mist.core.MaterialInformation(path_to_example_data) 
-        current_dir = os.path.dirname(os.path.abspath(__file__)) 
-        file = "additivefoam_input.txt" 
-        additivefoam_filepath = os.path.join(current_dir, file) 
+        user_input_dir = input("Enter desired file path here: ")
+        input_dir = user_input_dir or os.path.dirname(os.path.abspath(__file__)) 
+        file = "transportProperties.txt" 
+        additivefoam_filepath = os.path.join(input_dir, file) 
         try: 
-            mat.write_additivefoam_input(additivefoam_filepath) 
+            mat.write_additivefoam_transportProp(additivefoam_filepath) 
         # Asserts whether the file actually exists
             self.assertTrue(os.path.exists(additivefoam_filepath), f"File {additivefoam_filepath} should exist.") 
         except Exception as e: 
             self.fail(f"Exception occurred: {str(e)}") 
-
+            
+    def test_write_additivefoam_thermoPath(self):
+        path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json') 
+        mat = mist.core.MaterialInformation(path_to_example_data) 
+        current_dir = os.path.dirname(os.path.abspath(__file__)) 
+        file = "thermoPath.txt"
+        additivefoam_filepath2 = os.path.join(current_dir, file) 
+        try:
+            mat.write_additivefoam_thermoPath(additivefoam_filepath2)
+            self.assertTrue(os.path.exists(additivefoam_filepath2)), f"File {additivefoam_filepath2} should exist."
+        except Exception as a:
+            self.fail(f"Exception occured: {str(a)}")
 
     def test_write_3dthesis(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')

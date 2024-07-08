@@ -400,10 +400,7 @@ class MaterialInformation:
     
             return
     
-    def write_additivefoam_input(self, file):
-        specific_heat_1 = None
-        specific_heat_2 = None
-        # Reference temperature based on a property from self.properties
+    def write_additivefoam_transportProp(self, file):
         comment_block = """/*---------------------------------------------------------------------------
      AdditiveFOAM template input file (compatible with 1.0, OpenFOAM 10)
 
@@ -420,7 +417,6 @@ class MaterialInformation:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 """
-
         reference_temperature = self.properties["solidus_eutectic_temperature"].value
         p=(self.properties["thermal_conductivity_solid"].value_laurent_poly)
         labeled_values = {}
@@ -428,52 +424,150 @@ class MaterialInformation:
             label = f"thermal_cond_S{idx}" 
             first_value = pair[0]
             labeled_values[label] = first_value
-       
-        a = []
+        thermal_cond_solid = []
         for label, value in labeled_values.items():
-            a.append(value)
+            thermal_cond_solid.append(value)
             print(f"{value}")
+
         p=(self.properties["thermal_conductivity_liquid"].value_laurent_poly)
         first_values = [pair[0] for pair in p]
         labeled_values = {}
         for idx, pair in enumerate(p, 1):
-            label = f"thermal_cond_S{idx}" 
+            label = f"thermal_cond_L{idx}" 
             first_value = pair[0]
             labeled_values[label] = first_value
-        
-        b = []
+        thermal_cond_liquid = []
         for label, value in labeled_values.items():
-            b.append(value)
+            thermal_cond_liquid.append(value)
             print(f"{value}")
 
-        p = self.properties["specific_heat_solid"]
-        if (p.value_type == ValueTypes.SCALAR):
-                specific_heat_1 = p.value
-        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-                specific_heat_1 = p.evaluate_laurent_polynomial(reference_temperature)
-        else:
-                print("Error: ValueType not supported")
+        p = (self.properties["specific_heat_solid"].value_laurent_poly)
+        first_values = [pair[0] for pair in p]
+        labeled_values = {}
+        for idx, pair in enumerate(p, 1):
+            label = f"specific_heat_S{idx}" 
+            first_value = pair[0]
+            labeled_values[label] = first_value
+        specific_heat_solid = []
+        for label, value in labeled_values.items():
+            specific_heat_solid.append(value)
+            print(f"{value}")
 
-        p = self.properties["specific_heat_liquid"]
-        if (p.value_type == ValueTypes.SCALAR):
-                specific_heat_2 = p.value
-        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-                specific_heat_2 = p.evaluate_laurent_polynomial(reference_temperature)
+        p = (self.properties["specific_heat_liquid"].value_laurent_poly)
+        if self.properties["specific_heat_liquid"] == ValueTypes.LAURENT_POLYNOMIAL:
+            first_values = [pair[0] for pair in p]
+            labeled_values = {}
+            for idx, pair in enumerate(p, 1):
+                label = f"specific_heat_L{idx}" 
+                first_value = pair[0]
+                labeled_values[label] = first_value
+            specific_heat_liquid= []
+            for label, value in labeled_values.items():
+                specific_heat_liquid.append(value)
+                print(f"{value}")
         else:
-                print("Error: ValueType not supported")
-        
+            p = self.properties["specific_heat_liquid"].value
+            specific_heat_liquid = []
+            specific_heat_liquid.append(self.properties["specific_heat_liquid"].value) 
+            print(f"{value}")
+
+        density = None
+        p = self.properties["density"]
+        if p.value_type == ValueTypes.SCALAR:
+                density = p.value
+        elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
+                density = p.evaluate_laurent_polynomial(reference_temperature)
+        else:
+                print("Error: additiveFOAM requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.")   
+
+        dynamic_viscosity = None
+        p = self.properties["dynamic_viscosity"]
+        if p.value_type == ValueTypes.SCALAR:
+                dynamic_viscosity = p.value
+        elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
+                dynamic_viscosity = p.evaluate_laurent_polynomial(reference_temperature)
+        else:
+                print("Error: additiveFOAM requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.") 
+
+        thermal_expansion = None
+        p = self.properties["thermal_expansion"]
+        if p.value_type == ValueTypes.SCALAR:
+                thermal_expansion = p.value
+        elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
+                thermal_expansion = p.evaluate_laurent_polynomial(reference_temperature)
+        else:  
+               print("Error: additiveFOAM requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.") 
+
+        latent_heat_fusion = None
+        p = self.properties["latent_heat_fusion"]
+        if p.value_type == ValueTypes.SCALAR:
+                latent_heat_fusion = p.value
+        elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
+                latent_heat_fusion = p.evaluate_laurent_polynomial(reference_temperature)
+        else:  
+               print("Error: additiveFOAM requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.")
+
         with open(file, "w") as f:
             f.write(comment_block)
             f.write("solid\n{\n")
-            f.write(f"\tkappa\t ({a[0]} {a[1]} 0.0);\n") 
-            f.write(f"\tCp\t\t ({specific_heat_1} 0.0 0.0);\n")
-            f.write("}\n\n")
             
-            f.write("liquid\n{\n")
-            f.write(f"\tkappa\t ({b[0]} {b[1]} 0.0);\n") 
-            f.write(f"\tCp\t\t ({specific_heat_2} 0.0 0.0);\n")
-            f.write("}\n")
+            p = self.properties["thermal_conductivity_solid"]
+            if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                f.write(f"\tkappa\t ({thermal_cond_solid[0]} {thermal_cond_solid[1]} 0.0);\n")
+            else:
+                f.write(f"\tkappa\t ({self.properties['thermal_conductivity_solid'].value} 0.0 0.0);\n")
 
+            p = self.properties["specific_heat_solid"]
+            if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                f.write(f"\tCp\t\t ({specific_heat_solid[0]} {specific_heat_solid[1]} 0.0);\n")
+            else:
+                f.write(f"\tCp\t\t ({self.properties['specific_heat_solid'].value} 0.0 0.0);\n")
+            
+            f.write("}\n\n")
+            f.write("liquid\n{\n")
+
+            p = self.properties["thermal_conductivity_liquid"]
+            if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                f.write(f"\tkappa\t ({thermal_cond_liquid[0]} {thermal_cond_liquid[1]} 0.0);\n")
+            else:
+                f.write(f"\tkappa\t ({self.properties['thermal_conductivity_liquid'].value});\n")
+            
+            p = self.properties["specific_heat_liquid"]
+            if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                f.write(f"\tCp\t\t ({specific_heat_liquid[0]} {specific_heat_liquid[1]} 0.0);\n")
+            else:
+                f.write(f"\tCp\t\t ({self.properties['specific_heat_liquid'].value} 0.0 0.0);\n")
+
+            f.write("}\n\n")
+            f.write("powder\n{\n")
+            
+            p = self.properties["thermal_conductivity_solid"]
+            if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                f.write(f"\tkappa\t ({thermal_cond_solid[0]} {thermal_cond_solid[1]} 0.0);\n")
+            else:
+                f.write(f"\tkappa\t ({self.properties['thermal_conductivity_solid'].value} 0.0 0.0);\n")
+
+            p = self.properties["specific_heat_solid"]
+            if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                f.write(f"\tCp\t\t ({specific_heat_solid[0]} {specific_heat_solid[1]} 0.0);\n")
+            else:
+                f.write(f"\tCp\t\t ({self.properties['specific_heat_solid'].value} 0.0 0.0);\n")
+            
+            f.write("}\n\n")
+            f.write(f"rho     [1 -3 0 0 0 0 0]    {density};\n"
+        f"mu      [1 -1 -1  0 0 0 0]  {dynamic_viscosity};\n"
+        f"beta    [0 0 0 -1 0 0 0]    {thermal_expansion};\n"
+        f"DAS     [0 1 0 0 0 0 0]     10e-6;\n"
+        f"Lf      [0  2 -2  0 0 0 0]  {latent_heat_fusion:.2e};\n\n"
+        f"// ************************************************************************* //")
+            
+    def write_additivefoam_thermoPath(self, file):        
+        with open(file, "w") as g:
+            eutectic_temp = self.properties["solidus_eutectic_temperature"].value
+            liquidus_temp = self.properties["liquidus_temperature"].value
+            g.write(f"(\n")
+            g.write (f"{eutectic_temp:.4f}\t 1.0000 \n{liquidus_temp:.4f}\t 0.0000\n)")
+                
     def write_3dthesis_input(self, file, initial_temperature=None):
          # 3DThesis/autothesis/Condor assumes at "T_0" initial temperature value. Myna populates this from Peregrine. For now we add a placeholder of -1 unless the user specifies an intial temperature.
         if (initial_temperature == None):
