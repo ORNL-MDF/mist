@@ -142,10 +142,9 @@ class TestSuite(unittest.TestCase):
     def test_write_additivefoam_transportProp(self): 
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json') 
         mat = mist.core.MaterialInformation(path_to_example_data) 
-        user_input_dir = input("Enter desired file path here: ")
-        input_dir = user_input_dir or os.path.dirname(os.path.abspath(__file__)) 
+        current_dir = os.path.dirname(os.path.abspath(__file__)) 
         file = "transportProperties.txt" 
-        additivefoam_filepath = os.path.join(input_dir, file) 
+        additivefoam_filepath = os.path.join(current_dir, file) 
         try: 
             mat.write_additivefoam_transportProp(additivefoam_filepath) 
         # Asserts whether the file actually exists
