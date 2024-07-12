@@ -306,13 +306,7 @@ class MaterialInformation:
     def write_adamantine_input(self, file):
         reference_temperature = self.properties["solidus_eutectic_temperature"].value # For adamantine we assume that all temperature-dependent material properties are evaluated at the solidus temperature
 
-        p = self.properties["specific_heat_solid"]
-        if (p.value_type == ValueTypes.SCALAR):
-                specific_heat_1 = p.value
-        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-                specific_heat_1 = p.evaluate_laurent_polynomial(reference_temperature)
-        else:
-                print("Error: adamantine requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.")
+        specific_heat_solid = get_property("specific_heat_solid", "adamantine")
 
         p = self.properties["specific_heat_liquid"]
         if (p.value_type == ValueTypes.SCALAR):
@@ -364,7 +358,7 @@ class MaterialInformation:
                 f.write("\n\tmaterial_0\n\t{\n")
                 f.write("\t\tsolid\n\t\t{\n")
                 f.write(f"\t\t\tdensity {density} ;\n") 
-                f.write(f"\t\t\tspecific_heat {specific_heat_1} ;\n")  
+                f.write(f"\t\t\tspecific_heat {specific_heat_solid} ;\n")
                 f.write(f"\t\t\tthermal_conductivity_x {thermal_conductivity_1} ;\n") 
                 f.write(f"\t\t\tthermal_conductivity_z {thermal_conductivity_1} ;\n")
                 f.write(f"\t\t\temissivity {emissivity} ; \n")
@@ -417,14 +411,7 @@ class MaterialInformation:
         else:
             print("Error: autothesis requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes")
 
-        specific_heat = None
-        p = self.properties["specific_heat_solid"]
-        if (p.value_type == ValueTypes.SCALAR):
-            specific_heat = p.value
-        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-             specific_heat = p.evaluate_laurent_polynomial(reference_temperature)
-        else:
-            print("Error: autothesis requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes")
+        specific_heat = get_property("specific_heat", "autothesis")
 
         density = None
         p = self.properties["density"]
@@ -445,6 +432,16 @@ class MaterialInformation:
               f.write("\t p\t" + str(density) + "\n")
               f.write("}")
 
+    def get_property(self, property_name, code_name):
+        prop = None
+        p = self.properties[property_name]
+        if (p.value_type == ValueTypes.SCALAR):
+            prop = p.value
+        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+            prop = p.evaluate_laurent_polynomial(reference_temperature)
+        else:
+            print(f"Error: {code_name} requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes for {property_name}.")
+        return prop
 
     def replace_none_with_string(self, entry, replace_string):
         if entry == None:
