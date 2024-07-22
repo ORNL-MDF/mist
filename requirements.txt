@@ -1,2 +1,4 @@
 pandoc
 md2pdf
+weasyprint
+pydyf<=0.10.0
