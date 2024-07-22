@@ -437,6 +437,45 @@ class MaterialInformation:
             specific_heat_liquid.append(self.properties["specific_heat_liquid"].value) 
             print(f"{value}")
 
+        density = None
+        if (p.value_type == ValueTypes.SCALAR):	      
+            p = self.properties["density"]
+        specific_heat_2 = p.value	      
+        if p.value_type == ValueTypes.SCALAR:
+              density = p.value
+        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):	   
+            specific_heat_2 = p.evaluate_laurent_polynomial(reference_temperature)	    
+        else:
+            print("Error: additiveFOAM requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.")   
+
+
+        dynamic_viscosity = None
+        p = self.properties["dynamic_viscosity"]
+        if p.value_type == ValueTypes.SCALAR:
+                dynamic_viscosity = p.value
+        elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
+                dynamic_viscosity = p.evaluate_laurent_polynomial(reference_temperature)
+        else:
+                print("Error: additiveFOAM requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.") 
+
+        thermal_expansion = None
+        p = self.properties["thermal_expansion"]
+        if p.value_type == ValueTypes.SCALAR:
+                thermal_expansion = p.value
+        elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
+                thermal_expansion = p.evaluate_laurent_polynomial(reference_temperature)
+        else:  
+               print("Error: additiveFOAM requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.") 
+
+        latent_heat_fusion = None
+        p = self.properties["latent_heat_fusion"]
+        if p.value_type == ValueTypes.SCALAR:
+                latent_heat_fusion = p.value
+        elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
+                latent_heat_fusion = p.evaluate_laurent_polynomial(reference_temperature)
+        else:  
+               print("Error: additiveFOAM requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.")
+
         def get_property(self, property_name,):
          prop = None
          p = self.properties[property_name]
@@ -448,11 +487,6 @@ class MaterialInformation:
              print(f"Error: requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes for {property_name}.")
          return prop
         
-        density = get_property(self, "density")
-        dynamic_viscosity = get_property(self, "dynamic_viscosity")
-        thermal_expansion = get_property(self, "thermal_expansion")
-        latent_heat_fusion = get_property(self, "latent_heat_fusion")
-
         with open(file, "w") as f:
             f.write(comment_block)
             f.write("solid\n{\n")
