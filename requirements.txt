@@ -1,4 +1,4 @@
-pandoc==2.3
-md2pdf==1.0.1
-weasyprint==62.2
-pydyf==0.10.0
+pandoc
+md2pdf
+weasyprint
+pydyf<=0.10.0
