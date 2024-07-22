@@ -438,16 +438,13 @@ class MaterialInformation:
             print(f"{value}")
 
         density = None
-        if (p.value_type == ValueTypes.SCALAR):	      
-            p = self.properties["density"]
-        specific_heat_2 = p.value	      
+        p = self.properties["density"]
         if p.value_type == ValueTypes.SCALAR:
-              density = p.value
-        elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):	   
-            specific_heat_2 = p.evaluate_laurent_polynomial(reference_temperature)	    
+                density = p.value
+        elif p.value_type == ValueTypes.LAURENT_POLYNOMIAL:
+                density = p.evaluate_laurent_polynomial(reference_temperature)
         else:
-            print("Error: additiveFOAM requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.")   
-
+                print("Error: additiveFOAM requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.")   
 
         dynamic_viscosity = None
         p = self.properties["dynamic_viscosity"]
@@ -476,17 +473,6 @@ class MaterialInformation:
         else:  
                print("Error: additiveFOAM requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes.")
 
-        def get_property(self, property_name,):
-         prop = None
-         p = self.properties[property_name]
-         if (p.value_type == ValueTypes.SCALAR):
-             prop = p.value
-         elif (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-             prop = p.evaluate_laurent_polynomial(reference_temperature)
-         else:
-             print(f"Error: requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes for {property_name}.")
-         return prop
-        
         with open(file, "w") as f:
             f.write(comment_block)
             f.write("solid\n{\n")
@@ -541,7 +527,6 @@ class MaterialInformation:
         f"Lf      [0  2 -2  0 0 0 0]  {latent_heat_fusion:.2e};\n\n"
         f"// ************************************************************************* //")
             
-    
     def write_additivefoam_thermoPath(self, file):        
         with open(file, "w") as g:
             eutectic_temp = self.properties["solidus_eutectic_temperature"].value
