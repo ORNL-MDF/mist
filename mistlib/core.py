@@ -307,12 +307,12 @@ class MaterialInformation:
         reference_temperature = self.properties["solidus_eutectic_temperature"].value # For adamantine we assume that all temperature-dependent material properties are evaluated at the solidus temperature
         code_name = "adamantine"
 
-        specific_heat_1 = self.get_property("specific_heat_solid",  code_name)
-        specific_heat_2 = self.get_property("specific_heat_liquid", code_name)
-        thermal_conductivity_1 = self.get_property("thermal_conductivity_solid", code_name)
-        density = self.get_property("density",  code_name)
-        thermal_conductivity_2 = self.get_property("thermal_conductivity_liquid", code_name)
-        emissivity = self.get_property("emissivity", code_name)
+        specific_heat_1 = self.get_property("specific_heat_solid",  code_name, reference_temperature)
+        specific_heat_2 = self.get_property("specific_heat_liquid", code_name, reference_temperature)
+        thermal_conductivity_1 = self.get_property("thermal_conductivity_solid", code_name, reference_temperature)
+        density = self.get_property("density",  code_name, reference_temperature)
+        thermal_conductivity_2 = self.get_property("thermal_conductivity_liquid", code_name, reference_temperature)
+        emissivity = self.get_property("emissivity", code_name, reference_temperature)
         
         with open(file, 'w') as f:
                 f.write("materials\n{")
@@ -365,9 +365,9 @@ class MaterialInformation:
         code_name = "autothesis"
          # For autothesis we assume that all temperature-dependent material properties are evaluated at the solidus temperature
         reference_temperature = self.properties["solidus_eutectic_temperature"].value
-        thermal_conductivity = self.get_property("thermal_conductivity_solid", code_name)
-        density = self.get_property("density", code_name)
-        specific_heat = self.get_property("specific_heat_solid", code_name)
+        thermal_conductivity = self.get_property("thermal_conductivity_solid", code_name, reference_temperature)
+        density = self.get_property("density", code_name, reference_temperature)
+        specific_heat = self.get_property("specific_heat_solid", code_name, reference_temperature)
         
         with open(file, 'w') as f:
               f.write("Constants\n")
@@ -379,7 +379,7 @@ class MaterialInformation:
               f.write("\t p\t" + str(density) + "\n")
               f.write("}")
 
-    def get_property(self, property_name, code_name):
+    def get_property(self, property_name, code_name, reference_temperature):
         prop = None
         p = self.properties[property_name]
         if (p.value_type == ValueTypes.SCALAR):
