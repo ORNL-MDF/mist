@@ -366,7 +366,7 @@ class MaterialInformation:
     
             return
 
-    def write_additivefoam_transportProp(self, file):
+    def write_additivefoam_transportProp(self, file="transportProperties"):
         code_name = "AdditiveFOAM"
         comment_block = """/*---------------------------------------------------------------------------
      AdditiveFOAM template input file (compatible with 1.0, OpenFOAM 10)
@@ -414,16 +414,19 @@ class MaterialInformation:
 
         with open(file, "w") as f:
             f.write(content)
+        return file
 
-    def write_additivefoam_thermoPath(self, file):        
+    def write_additivefoam_thermoPath(self, file="thermoPath"):        
         with open(file, "w") as g:
             eutectic_temp = self.properties["solidus_eutectic_temperature"].value
             liquidus_temp = self.properties["liquidus_temperature"].value
             g.write (f"(\n{eutectic_temp:.4f}\t 1.0000 \n{liquidus_temp:.4f}\t 0.0000\n)")
-
-    def write_additivefoam_input(self, file):
-        write_additivefoam_transportProp(file)
-        write_additivefoam_thermoPath(file)
+        return file
+    
+    def write_additivefoam(self, transport_file="transportProperties", thermo_file="thermoPath"):
+        self.write_additivefoam_transportProp(file=transport_file)
+        self.write_additivefoam_thermoPath(file=thermo_file)
+        return [transport_file, thermo_file]
 
     def write_3dthesis_input(self, file, initial_temperature=None):
          # 3DThesis/autothesis/Condor assumes at "T_0" initial temperature value. Myna populates this from Peregrine. For now we add a placeholder of -1 unless the user specifies an intial temperature.

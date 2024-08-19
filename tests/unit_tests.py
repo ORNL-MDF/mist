@@ -136,27 +136,14 @@ class TestSuite(unittest.TestCase):
         # Assert that the file now exists
         self.assertTrue(os.path.exists(adamantine_file_path), f"File {file} should exist.")
 
-
-    def test_write_additivefoam_transportProp(self): 
+    def test_write_additivefoam(self): 
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
         mat = mist.core.MaterialInformation(path_to_example_data)
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        af_file = "transportProperties.txt"
-        additivefoam_filepath = os.path.join(current_dir, af_file)
+        transport_filepath, thermo_filepath = mat.write_additivefoam_input()
 
-        mat.write_additivefoam_transportProp(additivefoam_filepath)
-        # Asserts whether the file actually exists
-        self.assertTrue(os.path.exists(additivefoam_filepath), f"File {additivefoam_filepath} should exist.")
-            
-    def test_write_additivefoam_thermoPath(self):
-        path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
-        mat = mist.core.MaterialInformation(path_to_example_data)
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        af_file = "thermoPath.txt"
-        additivefoam_filepath2 = os.path.join(current_dir, af_file)
-
-        mat.write_additivefoam_thermoPath(additivefoam_filepath2)
-        self.assertTrue(os.path.exists(additivefoam_filepath2)), f"File {additivefoam_filepath2} should exist."
+        # Asserts whether the files actually exist
+        self.assertTrue(os.path.exists(transport_filepath), f"File {thermo_filepath} should exist.")
+        self.assertTrue(os.path.exists(thermo_filepath)), f"File {thermo_filepath} should exist."
 
     def test_write_3dthesis(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
