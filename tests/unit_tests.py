@@ -129,15 +129,21 @@ class TestSuite(unittest.TestCase):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         file = "mistinput.info"
         adamantine_file_path = os.path.join(current_dir, 'mistinput.info')
-        try:
-            # Call the function that should create the file
-            mat.write_adamantine_input(adamantine_file_path)
-            
-            # Assert that the file now exists
-            self.assertTrue(os.path.exists(adamantine_file_path), f"File {file} should exist.")
-        
-        except AssertionError as e:
-            self.fail(f"AssertionError occurred: {str(e)}")
+
+        # Call the function that should create the file
+        mat.write_adamantine_input(adamantine_file_path)
+
+        # Assert that the file now exists
+        self.assertTrue(os.path.exists(adamantine_file_path), f"File {file} should exist.")
+
+    def test_write_additivefoam(self): 
+        path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')
+        mat = mist.core.MaterialInformation(path_to_example_data)
+        transport_filepath, thermo_filepath = mat.write_additivefoam_input()
+
+        # Asserts whether the files actually exist
+        self.assertTrue(os.path.exists(transport_filepath), f"File {thermo_filepath} should exist.")
+        self.assertTrue(os.path.exists(thermo_filepath)), f"File {thermo_filepath} should exist."
 
     def test_write_3dthesis(self):
         path_to_example_data = os.path.join(os.path.dirname(__file__), '../examples/SS316L.json')

@@ -314,28 +314,37 @@ class MaterialInformation:
         thermal_conductivity_2 = self.get_property("thermal_conductivity_liquid", code_name, reference_temperature)
         emissivity = self.get_property("emissivity", code_name, reference_temperature)
         
+        content = (
+            f"materials\n{{"
+            f"\n\tn_material 1"
+            f"\n\tproperty_format polynomial"
+            f"\n\tmaterial_0"
+            f"\n\t{{"
+            f"\n\t\tsolid"
+            f"\n\t\t{{"
+            f"\n\t\t\tdensity {density} ;"
+            f"\n\t\t\tspecific_heat {specific_heat_1} ;"
+            f"\n\t\t\tthermal_conductivity_x {thermal_conductivity_1} ;"
+            f"\n\t\t\tthermal_conductivity_z {thermal_conductivity_1} ;"
+            f"\n\t\t\temissivity {emissivity} ;"
+            f"\n\t\t}}"
+            f"\n\t\tliquid"
+            f"\n\t\t{{"
+            f"\n\t\t\tdensity {density} ;"
+            f"\n\t\t\tspecific_heat {specific_heat_2} ;"
+            f"\n\t\t\tthermal_conductivity_x {thermal_conductivity_2} ;"
+            f"\n\t\t\tthermal_conductivity_z {thermal_conductivity_2} ;"
+            f"\n\t\t\temissivity {emissivity} ;"
+            f"\n\t\t}}"
+            f"\n\tsolidus {self.properties['solidus_eutectic_temperature'].value} ;"
+            f"\n\tliquidus {self.properties['liquidus_temperature'].value} ;"
+            f"\n\tlatent heat {self.properties['latent_heat_fusion'].value} ;"
+            f"\n\t}}"
+            f"\n}}"
+        ) 
         with open(file, 'w') as f:
-                f.write("materials\n{")
-                f.write(f"\n\tn_material 1\n")
-                f.write("\n\tproperty_format polynomial\n")  # This may need to be dynamic
-                f.write("\n\tmaterial_0\n\t{\n")
-                f.write("\t\tsolid\n\t\t{\n")
-                f.write(f"\t\t\tdensity {density} ;\n") 
-                f.write(f"\t\t\tspecific_heat {specific_heat_1} ;\n")
-                f.write(f"\t\t\tthermal_conductivity_x {thermal_conductivity_1} ;\n") 
-                f.write(f"\t\t\tthermal_conductivity_z {thermal_conductivity_1} ;\n")
-                f.write(f"\t\t\temissivity {emissivity} ; \n")
-                f.write("\t\t}\n")
-                f.write("\t\tliquid\n\t\t{\n")
-                f.write(f"\t\t\tdensity {density} ;\n")
-                f.write(f"\t\t\tspecific_heat {specific_heat_2} ;\n")
-                f.write(f"\t\t\tthermal_conductivity_x {thermal_conductivity_2} ;\n")
-                f.write(f"\t\t\tthermal_conductivity_z {thermal_conductivity_2} ;\n")
-                f.write(f"\t\t\temissivity {emissivity} ; \n")
-                f.write("\t\t}\n")
-                f.write(f"\tsolidus {self.properties['solidus_eutectic_temperature'].value} ;\n")
-                f.write(f"\tliquidus {self.properties['liquidus_temperature'].value} ;\n")
-                f.write(f"\tlatent heat {self.properties['latent_heat_fusion'].value} ;\n\t\t}}\n}}")
+             f.write(content)
+        
        
         return    
 
@@ -357,6 +366,84 @@ class MaterialInformation:
     
             return
 
+    def write_additivefoam_transportProp(self, file="transportProperties"):
+        code_name = "AdditiveFOAM"
+        comment_block = """/*---------------------------------------------------------------------------
+     AdditiveFOAM template input file (compatible with 1.0, OpenFOAM 10)
+
+                      Created with Mist
+  ---------------------------------------------------------------------------*/
+  FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      transportProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+    """
+        def get_coefficient_string(variable_name, property_name):
+            p = self.properties[property_name]
+            if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                all_coeff = ""
+                # Extract up to the third order coefficients for AdditiveFOAM
+                for term in p.value_laurent_poly:
+                    if len(all_coeff.split("\t")) < 4:
+                        all_coeff += f"{term[0]}\t"
+                # Fill any missing coefficients
+                if len(p.value_laurent_poly) < 3:
+                    while len(all_coeff.split("\t")) < 4:
+                        all_coeff += "0.0\t"
+                return f"\t{variable_name}\t({all_coeff.strip()});\n"
+            else:
+                print(f"Warning: converting scalar into polynomial.")
+                return f"\t{variable_name}\t({p.value}\t0.0\t0.0);\n"
+        
+        content = comment_block
+
+        content += "solid\n{\n"
+        content += get_coefficient_string("kappa", "thermal_conductivity_solid")
+        content += get_coefficient_string("Cp", "specific_heat_solid")
+
+        content += "}\n\nliquid\n{\n"
+        content += get_coefficient_string("kappa", "thermal_conductivity_liquid")
+        content += get_coefficient_string("Cp", "specific_heat_liquid")
+
+        content += "}\n\npowder\n{\n"
+        content += get_coefficient_string("kappa", "thermal_conductivity_solid")
+        content += get_coefficient_string("Cp", "specific_heat_solid")
+        content += "}\n\n"
+
+        reference_temperature = self.properties["solidus_eutectic_temperature"].value
+        density = self.get_property("density", code_name, reference_temperature)
+        latent_heat_fusion = self.get_property("latent_heat_fusion", code_name, reference_temperature)
+        dynamic_viscosity = self.get_property("dynamic_viscosity", code_name, reference_temperature)
+        thermal_expansion = self.get_property("thermal_expansion", code_name, reference_temperature)
+        content += f"rho     [1 -3 0 0 0 0 0]    {density};\n"
+        content += f"mu      [1 -1 -1  0 0 0 0]  {dynamic_viscosity};\n"
+        content += f"beta    [0 0 0 -1 0 0 0]    {thermal_expansion};\n"
+        content += f"DAS     [0 1 0 0 0 0 0]     10e-6;\n"
+        content += f"Lf      [0  2 -2  0 0 0 0]  {latent_heat_fusion:.2e};\n\n"
+        content += f"// ************************************************************************* //"
+
+        with open(file, "w") as f:
+            f.write(content)
+        return file
+
+    def write_additivefoam_thermoPath(self, file="thermoPath"):        
+        with open(file, "w") as g:
+            eutectic_temp = self.properties["solidus_eutectic_temperature"].value
+            liquidus_temp = self.properties["liquidus_temperature"].value
+            g.write (f"(\n{eutectic_temp:.4f}\t 1.0000 \n{liquidus_temp:.4f}\t 0.0000\n)")
+        return file
+    
+    def write_additivefoam_input(self, transport_file="transportProperties", thermo_file="thermoPath"):
+        self.write_additivefoam_transportProp(file=transport_file)
+        self.write_additivefoam_thermoPath(file=thermo_file)
+        return [transport_file, thermo_file]
+
     def write_3dthesis_input(self, file, initial_temperature=None):
          # 3DThesis/autothesis/Condor assumes at "T_0" initial temperature value. Myna populates this from Peregrine. For now we add a placeholder of -1 unless the user specifies an intial temperature.
         if (initial_temperature == None):
@@ -369,15 +456,18 @@ class MaterialInformation:
         density = self.get_property("density", code_name, reference_temperature)
         specific_heat = self.get_property("specific_heat_solid", code_name, reference_temperature)
         
+        content_to_write = (
+                "Constants\n"
+                "{\n"
+                f"\t T_0\t{initial_temperature}\n"
+                f"\t T_L\t{self.properties['liquidus_temperature'].value}\n"
+                f"\t k\t{thermal_conductivity}\n"
+                f"\t c\t{specific_heat}\n"
+                f"\t p\t{density}\n"
+                "}"
+            ) 
         with open(file, 'w') as f:
-              f.write("Constants\n")
-              f.write("{\n")
-              f.write("\t T_0\t" + str(initial_temperature) + "\n")
-              f.write("\t T_L\t" + str(self.properties["liquidus_temperature"].value) + "\n")
-              f.write("\t k\t" + str(thermal_conductivity) + "\n")
-              f.write("\t c\t" + str(specific_heat) + "\n")
-              f.write("\t p\t" + str(density) + "\n")
-              f.write("}")
+            f.write(content_to_write)
 
     def get_property(self, property_name, code_name, reference_temperature):
         prop = None
@@ -401,7 +491,3 @@ class MaterialInformation:
         # Check if the information is complete by a user-specified standard
         # TODO
         return
-    
-    
-        
-
