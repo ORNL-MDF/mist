@@ -384,20 +384,36 @@ class MaterialInformation:
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     """
+        def get_coefficient_string(variable_name, property_name):
+            p = self.properties[property_name]
+            if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+                all_coeff = ""
+                # Extract up to the third order coefficients for AdditiveFOAM
+                for term in p.value_laurent_poly:
+                    if len(all_coeff.split("\t")) < 4:
+                        all_coeff += f"{term[0]}\t"
+                # Fill any missing coefficients
+                if len(p.value_laurent_poly) < 3:
+                    while len(all_coeff.split("\t")) < 4:
+                        all_coeff += "0.0\t"
+                return f"\t{variable_name}\t({all_coeff.strip()});\n"
+            else:
+                print(f"Warning: converting scalar into polynomial.")
+                return f"\t{variable_name}\t({p.value}\t0.0\t0.0);\n"
         
         content = comment_block
 
         content += "solid\n{\n"
-        content += self.get_coefficient_string("kappa", "thermal_conductivity_solid")
-        content += self.get_coefficient_string("Cp", "specific_heat_solid")
+        content += get_coefficient_string("kappa", "thermal_conductivity_solid")
+        content += get_coefficient_string("Cp", "specific_heat_solid")
 
         content += "}\n\nliquid\n{\n"
-        content += self.get_coefficient_string("kappa", "thermal_conductivity_liquid")
-        content += self.get_coefficient_string("Cp", "specific_heat_liquid")
+        content += get_coefficient_string("kappa", "thermal_conductivity_liquid")
+        content += get_coefficient_string("Cp", "specific_heat_liquid")
 
         content += "}\n\npowder\n{\n"
-        content += self.get_coefficient_string("kappa", "thermal_conductivity_solid")
-        content += self.get_coefficient_string("Cp", "specific_heat_solid")
+        content += get_coefficient_string("kappa", "thermal_conductivity_solid")
+        content += get_coefficient_string("Cp", "specific_heat_solid")
         content += "}\n\n"
 
         reference_temperature = self.properties["solidus_eutectic_temperature"].value
@@ -406,7 +422,7 @@ class MaterialInformation:
         dynamic_viscosity = self.get_property("dynamic_viscosity", code_name, reference_temperature)
         thermal_expansion = self.get_property("thermal_expansion", code_name, reference_temperature)
         content += f"rho     [1 -3 0 0 0 0 0]    {density};\n"
-        content +=  f"mu      [1 -1 -1  0 0 0 0]  {dynamic_viscosity};\n"
+        content += f"mu      [1 -1 -1  0 0 0 0]  {dynamic_viscosity};\n"
         content += f"beta    [0 0 0 -1 0 0 0]    {thermal_expansion};\n"
         content += f"DAS     [0 1 0 0 0 0 0]     10e-6;\n"
         content += f"Lf      [0  2 -2  0 0 0 0]  {latent_heat_fusion:.2e};\n\n"
@@ -423,7 +439,7 @@ class MaterialInformation:
             g.write (f"(\n{eutectic_temp:.4f}\t 1.0000 \n{liquidus_temp:.4f}\t 0.0000\n)")
         return file
     
-    def write_additivefoam(self, transport_file="transportProperties", thermo_file="thermoPath"):
+    def write_additivefoam_input(self, transport_file="transportProperties", thermo_file="thermoPath"):
         self.write_additivefoam_transportProp(file=transport_file)
         self.write_additivefoam_thermoPath(file=thermo_file)
         return [transport_file, thermo_file]
@@ -463,23 +479,6 @@ class MaterialInformation:
         else:
             print(f"Error: {code_name} requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes for {property_name}.")
         return prop
-
-    def get_coefficient_string(self, variable_name, property_name):
-        p = self.properties[property_name]
-        if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-            all_coeff = "("
-            for term in p.value_laurent_poly:
-                # Extract the coefficient only
-                all_coeff += str(term[0]) + "\t "
-            # FIXME: this assumes third order for AdditiveFOAM
-            if len(p.value_laurent_poly) < 3:
-                all_coeff += "0.0"
-            all_coeff += ")"
-            return f"\t{variable_name}\t {all_coeff};\n"
-        else:
-            print(f"Warning: converting scalar into polynomial.")
-            # FIXME: this assumes third order for AdditiveFOAM
-            return f"\t{variable_name}\t {p.value} \t 0.0 \t0.0;\n"
 
     def replace_none_with_string(self, entry, replace_string):
         if entry == None:
