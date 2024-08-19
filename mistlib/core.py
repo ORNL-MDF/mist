@@ -365,70 +365,13 @@ class MaterialInformation:
                 output_file.write(input_content)
     
             return
-    
-
-    import numpy as np
-
-    def process_properties(self):
-        # Properties to process
-        properties = ["thermal_conductivity_solid", "thermal_conductivity_liquid", "specific_heat_liquid", "specific_heat_solid"]
-
-        # Initialize dictionaries to store the coefficients
-        thermal_cond_solid = {}
-        thermal_cond_liquid = {}
-        specific_heat_liquid = {}
-        specific_heat_solid = {}
-
-        def ensure_three_values(array):
-            result = np.zeros(3)
-            result[:min(len(array), 3)] = array[:3]
-            return result
-
-        # Iterate over each property
-        for prop in properties:
-            # Retrieve terms for the current property
-            terms = self.properties[prop].value_laurent_poly
-            
-            # Convert terms directly into NumPy arrays
-            terms = np.array(terms)  # Ensure terms is an array-like structure
-            
-            # Separate exponents and coefficients
-            coefficients = terms[:, 0]  # Assuming first column is coefficients
-            exponents = terms[:, 1]     # Assuming second column is exponents
-
-            # Ensure arrays have exactly three values
-            coefficients = ensure_three_values(coefficients)
-            exponents = ensure_three_values(exponents)
-
-            # Create a dictionary mapping exponents to coefficients
-            exp_to_coeff = dict(zip(exponents, coefficients))
-
-            # Store in the appropriate dictionary
-            if prop == "thermal_conductivity_solid":
-                thermal_cond_solid = exp_to_coeff
-            elif prop == "thermal_conductivity_liquid":
-                thermal_cond_liquid = exp_to_coeff
-            elif prop == "specific_heat_liquid":
-                specific_heat_liquid = exp_to_coeff
-            elif prop == "specific_heat_solid":
-                specific_heat_solid = exp_to_coeff
-
-        # Convert dictionaries to NumPy arrays if needed
-        thermal_cond_solid_array = np.array(list(thermal_cond_solid.items()))
-        thermal_cond_liquid_array = np.array(list(thermal_cond_liquid.items()))
-        specific_heat_liquid_array = np.array(list(specific_heat_liquid.items()))
-        specific_heat_solid_array = np.array(list(specific_heat_solid.items()))
-        print(thermal_cond_liquid_array)
-
-        # Return the arrays
-        return thermal_cond_liquid_array, thermal_cond_solid_array, specific_heat_liquid_array, specific_heat_solid_array
 
     def write_additivefoam_transportProp(self, file):
         code_name = "AdditiveFOAM"
         comment_block = """/*---------------------------------------------------------------------------
      AdditiveFOAM template input file (compatible with 1.0, OpenFOAM 10)
 
-                      Created for simulation with Myna
+                      Created with Mist
   ---------------------------------------------------------------------------*/
   FoamFile
 {
@@ -442,132 +385,45 @@ class MaterialInformation:
 
     """
         
+        content = comment_block
+
+        content += "solid\n{\n"
+        content += self.get_coefficient_string("kappa", "thermal_conductivity_solid")
+        content += self.get_coefficient_string("Cp", "specific_heat_solid")
+
+        content += "}\n\nliquid\n{\n"
+        content += self.get_coefficient_string("kappa", "thermal_conductivity_liquid")
+        content += self.get_coefficient_string("Cp", "specific_heat_liquid")
+
+        content += "}\n\npowder\n{\n"
+        content += self.get_coefficient_string("kappa", "thermal_conductivity_solid")
+        content += self.get_coefficient_string("Cp", "specific_heat_solid")
+        content += "}\n\n"
+
         reference_temperature = self.properties["solidus_eutectic_temperature"].value
-        thermal_cond_liquid = self.process_properties(self)
-        # p=(self.properties["thermal_conductivity_solid"].value_laurent_poly)
-        # if self.properties["thermal_conductivity_solid"] == ValueTypes.LAURENT_POLYNOMIAL:
-        #     if len(p) > 3:
-        #         raise ValueError("Error: More than 3 pairs are provided.")
-        # labeled_values = {}
-        # for idx, pair in enumerate(p, 1):
-        #     label = f"thermal_cond_S{idx}" 
-        #     first_value = pair[0]
-        #     labeled_values[label] = first_value
-        # thermal_cond_solid = []
-        # for label, value in labeled_values.items():
-        #     thermal_cond_solid.append(value)
-
-        # p=(self.properties["thermal_conductivity_liquid"].value_laurent_poly)
-        # if self.properties["thermal_conductivity_liquid"] == ValueTypes.LAURENT_POLYNOMIAL:
-        #     if len(p) > 3:
-        #         raise ValueError("Error: More than 3 pairs are provided.")
-        # first_values = [pair[0] for pair in p]
-        # labeled_values = {}
-        # for idx, pair in enumerate(p, 1):
-        #     label = f"thermal_cond_L{idx}" 
-        #     first_value = pair[0]
-        #     labeled_values[label] = first_value
-        # thermal_cond_liquid = []
-        # for label, value in labeled_values.items():
-        #     thermal_cond_liquid.append(value)
-
-        # p = (self.properties["specific_heat_solid"].value_laurent_poly)
-        # if self.properties["specific_heat_solid"] == ValueTypes.LAURENT_POLYNOMIAL:
-        #     if len(p) > 3:
-        #         raise ValueError("Error: More than 3 pairs are provided.")
-        # first_values = [pair[0] for pair in p]
-        # labeled_values = {}
-        # for idx, pair in enumerate(p, 1):
-        #     label = f"specific_heat_S{idx}" 
-        #     first_value = pair[0]
-        #     labeled_values[label] = first_value
-        # specific_heat_solid = []
-        # for label, value in labeled_values.items():
-        #     specific_heat_solid.append(value)
-
-        # p = (self.properties["specific_heat_liquid"].value_laurent_poly)
-        # if self.properties["specific_heat_liquid"] == ValueTypes.LAURENT_POLYNOMIAL:
-        #     if len(p) > 3:
-        #         raise ValueError("Error: More than 3 pairs are provided.")
-        #     first_values = [pair[0] for pair in p]
-        #     labeled_values = {}
-        #     for idx, pair in enumerate(p, 1):
-        #         label = f"specific_heat_L{idx}" 
-        #         first_value = pair[0]
-        #         labeled_values[label] = first_value
-        #     specific_heat_liquid= []
-        #     for label, value in labeled_values.items():
-        #         specific_heat_liquid.append(value)
-
-        # else:
-        #     p = self.properties["specific_heat_liquid"].value
-        #     specific_heat_liquid = []
-        #     specific_heat_liquid.append(self.properties["specific_heat_liquid"].value) 
-            
-
         density = self.get_property("density", code_name, reference_temperature)
         latent_heat_fusion = self.get_property("latent_heat_fusion", code_name, reference_temperature)
         dynamic_viscosity = self.get_property("dynamic_viscosity", code_name, reference_temperature)
         thermal_expansion = self.get_property("thermal_expansion", code_name, reference_temperature)
-        
+        content += f"rho     [1 -3 0 0 0 0 0]    {density};\n"
+        content +=  f"mu      [1 -1 -1  0 0 0 0]  {dynamic_viscosity};\n"
+        content += f"beta    [0 0 0 -1 0 0 0]    {thermal_expansion};\n"
+        content += f"DAS     [0 1 0 0 0 0 0]     10e-6;\n"
+        content += f"Lf      [0  2 -2  0 0 0 0]  {latent_heat_fusion:.2e};\n\n"
+        content += f"// ************************************************************************* //"
+
         with open(file, "w") as f:
-            content = (comment_block +
-                        "solid\n{\n")
-            
-            p = self.properties["thermal_conductivity_solid"]
-            if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-                content += (f"\tkappa\t ({thermal_cond_solid_array};\n")
-            else:
-                content += (f"\tkappa\t ({self.properties['thermal_conductivity_solid'].value} 0.0 0.0);\n")
-
-            p = self.properties["specific_heat_solid"]
-            if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-                content += (f"\tCp\t\t ({specific_heat_solid});\n")
-            else:
-                content += (f"\tCp\t\t ({self.properties['specific_heat_solid'].value} 0.0 0.0);\n")
-        
-            content += "}\n\nliquid\n{\n"
-
-            p = self.properties["thermal_conductivity_liquid"]
-            if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-                content += (f"\tkappa\t ({thermal_cond_liquid};\n")
-            else:
-                content +=  (f"\tkappa\t ({self.properties['thermal_conductivity_liquid'].value});\n")
-            
-            p = self.properties["specific_heat_liquid"]
-            if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-                content += f"\tCp\t\t ({specific_heat_liquid[0]} {specific_heat_liquid[1]} 0.0);\n"
-            else:
-                content += (f"\tCp\t\t ({self.properties['specific_heat_liquid'].value} 0.0 0.0);\n")
-
-            content += "}\n\npowder\n{\n"
-            
-            p = self.properties["thermal_conductivity_solid"]
-            if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-                content += (f"\tkappa\t ({thermal_cond_solid};\n")
-            else:
-                content += (f"\tkappa\t ({self.properties['thermal_conductivity_solid'].value} 0.0 0.0);\n")
-
-            p = self.properties["specific_heat_solid"]
-            if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
-                content += (f"\tCp\t\t ({specific_heat_solid});\n")
-            else:
-                content += (f"\tCp\t\t ({self.properties['specific_heat_solid'].value} 0.0 0.0);\n")
-
-            content += "}\n\n"
             f.write(content)
-            f.write(f"rho     [1 -3 0 0 0 0 0]    {density};\n"
-        f"mu      [1 -1 -1  0 0 0 0]  {dynamic_viscosity};\n"
-        f"beta    [0 0 0 -1 0 0 0]    {thermal_expansion};\n"
-        f"DAS     [0 1 0 0 0 0 0]     10e-6;\n"
-        f"Lf      [0  2 -2  0 0 0 0]  {latent_heat_fusion:.2e};\n\n"
-        f"// ************************************************************************* //")
-            
+
     def write_additivefoam_thermoPath(self, file):        
         with open(file, "w") as g:
             eutectic_temp = self.properties["solidus_eutectic_temperature"].value
             liquidus_temp = self.properties["liquidus_temperature"].value
             g.write (f"(\n{eutectic_temp:.4f}\t 1.0000 \n{liquidus_temp:.4f}\t 0.0000\n)")
+
+    def write_additivefoam_input(self, file):
+        write_additivefoam_transportProp(file)
+        write_additivefoam_thermoPath(file)
 
     def write_3dthesis_input(self, file, initial_temperature=None):
          # 3DThesis/autothesis/Condor assumes at "T_0" initial temperature value. Myna populates this from Peregrine. For now we add a placeholder of -1 unless the user specifies an intial temperature.
@@ -604,6 +460,23 @@ class MaterialInformation:
         else:
             print(f"Error: {code_name} requires either SCALAR or LAURENT_POLYNOMIAL ValueTypes for {property_name}.")
         return prop
+
+    def get_coefficient_string(self, variable_name, property_name):
+        p = self.properties[property_name]
+        if (p.value_type == ValueTypes.LAURENT_POLYNOMIAL):
+            all_coeff = "("
+            for term in p.value_laurent_poly:
+                # Extract the coefficient only
+                all_coeff += str(term[0]) + "\t "
+            # FIXME: this assumes third order for AdditiveFOAM
+            if len(p.value_laurent_poly) < 3:
+                all_coeff += "0.0"
+            all_coeff += ")"
+            return f"\t{variable_name}\t {all_coeff};\n"
+        else:
+            print(f"Warning: converting scalar into polynomial.")
+            # FIXME: this assumes third order for AdditiveFOAM
+            return f"\t{variable_name}\t {p.value} \t 0.0 \t0.0;\n"
 
     def replace_none_with_string(self, entry, replace_string):
         if entry == None:
