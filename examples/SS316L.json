@@ -129,6 +129,18 @@
             "reference": "None",
             "uncertainty": "None",
             "print_symbol": "\\alpha"
+        },
+        "interface_response_function": {
+            "print_name": "Dendrite tip velocity",
+            "value_laurent_poly": [[0,0],[-0.000517783154178829,1],[0.000231067291419276, 2]],
+            "dependent_variable_print_name": "Undercooling",
+            "dependent_variable_print_symbol": "\\Delta T",
+            "dependent_variable_unit": "K",
+            "unit": "m/s",
+            "reference": "W. Tan, Y.C. Shin, Multi-scale modeling of solidification and microstructure development in laser keyhole welding process for austenitic stainless steel, Computational Materials Science 98 (2015) 446-458. DOI:  https://doi.org/10.1016/j.commatsci.2014.10.063",
+            "uncertainty": "None",
+            "print_symbol": "IRF",
+            "note": "These values are from a 2nd order polynomial fit with y-intercept of 0.0 (R^2 = 0.995) using data from the Fe-18.5Cr-12.5Ni line in Fig. A2"
         }
     },
     "note": "This file currently excludes the surface tension, marangoni coefficient, and the vapor pressure due to the need for function representations other than Laurent polynomials."

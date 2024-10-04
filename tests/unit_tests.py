@@ -174,6 +174,18 @@ class TestSuite(unittest.TestCase):
         self.assertTrue(
             os.path.exists(adamantine_file_path), f"File {file} should exist."
         )
+    
+    def test_write_exaca(self):
+        path_to_example_data = os.path.join(
+            os.path.dirname(__file__), "../examples/SS316L.json"
+        )
+        mat = mist.core.MaterialInformation(path_to_example_data)
+        material_filepath = mat.write_exaca_input()
+
+        # Asserts whether the files actually exist
+        self.assertTrue(
+            os.path.exists(material_filepath), f"File {material_filepath} should exist."
+        )
 
     def test_write_additivefoam(self):
         path_to_example_data = os.path.join(
