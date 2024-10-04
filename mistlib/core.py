@@ -115,6 +115,7 @@ class MaterialInformation:
             "laser_absorption",
             "solidus_eutectic_temperature",
             "hall_petch_coefficient",
+            "interface_response_function",
         ]
 
         self.composition = {}
@@ -605,6 +606,40 @@ class MaterialInformation:
         self.write_additivefoam_transportProp(file=transport_file)
         self.write_additivefoam_thermoPath(file=thermo_file)
         return [transport_file, thermo_file]
+
+    def write_exaca_input(self, file="exaca_material_file.json"):
+        data = {}
+        eutectic_temp = self.properties["solidus_eutectic_temperature"].value
+        liquidus_temp = self.properties["liquidus_temperature"].value
+        data["freezing_range"] = liquidus_temp - eutectic_temp
+        # Get interface response function as a Laurent polynomial
+        irf = self.properties["interface_response_function"].value_laurent_poly
+        irf_dict = {}
+        for value, order in irf:
+            irf_dict[order] = value
+        if len(irf) == 4:
+            data["function"] = "cubic"
+            data["coefficients"] = {
+                "A": irf_dict[3],
+                "B": irf_dict[2],
+                "C": irf_dict[1],
+                "D": irf_dict[0],
+            }
+        elif len(irf) == 3:
+            data["function"] = "quadratic"
+            data["coefficients"] = {
+                "A": irf_dict[2],
+                "B": irf_dict[1],
+                "C": irf_dict[0],
+            }
+        else:
+            print(
+                f"interface_response_function must be polynomial of 3rd order or less for ExaCA input file"
+            )
+            raise ValueError
+        with open(file, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+        return file
 
     def write_3dthesis_input(self, file, initial_temperature=None):
         # 3DThesis/autothesis/Condor assumes at "T_0" initial temperature value. Myna populates this from Peregrine. For now we add a placeholder of -1 unless the user specifies an initial temperature.
