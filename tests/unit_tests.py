@@ -174,7 +174,7 @@ class TestSuite(unittest.TestCase):
         self.assertTrue(
             os.path.exists(adamantine_file_path), f"File {file} should exist."
         )
-    
+
     def test_write_exaca(self):
         path_to_example_data = os.path.join(
             os.path.dirname(__file__), "../examples/SS316L.json"

@@ -619,17 +619,28 @@ class MaterialInformation:
             irf_dict[order] = value
         if len(irf) == 4:
             data["function"] = "cubic"
-            data["coefficients"] = {"A": irf_dict[3], "B": irf_dict[2], "C": irf_dict[1], "D": irf_dict[0]}
+            data["coefficients"] = {
+                "A": irf_dict[3],
+                "B": irf_dict[2],
+                "C": irf_dict[1],
+                "D": irf_dict[0],
+            }
         elif len(irf) == 3:
             data["function"] = "quadratic"
-            data["coefficients"] = {"A": irf_dict[2], "B": irf_dict[1], "C": irf_dict[0]}
+            data["coefficients"] = {
+                "A": irf_dict[2],
+                "B": irf_dict[1],
+                "C": irf_dict[0],
+            }
         else:
-            print(f"interface_response_function must be polynomial of 3rd order or less for ExaCA input file")
+            print(
+                f"interface_response_function must be polynomial of 3rd order or less for ExaCA input file"
+            )
             raise ValueError
-        with open(file, 'w', encoding='utf-8') as f:
+        with open(file, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
         return file
-    
+
     def write_3dthesis_input(self, file, initial_temperature=None):
         # 3DThesis/autothesis/Condor assumes at "T_0" initial temperature value. Myna populates this from Peregrine. For now we add a placeholder of -1 unless the user specifies an initial temperature.
         if initial_temperature == None:
