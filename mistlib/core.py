@@ -470,7 +470,7 @@ class MaterialInformation:
 
         content = (
             f"materials\n{{"
-            f"\n\tn_material 1"
+            f"\n\tn_materials 1"
             f"\n\tproperty_format polynomial"
             f"\n\tmaterial_0"
             f"\n\t{{"
@@ -492,7 +492,7 @@ class MaterialInformation:
             f"\n\t\t}}"
             f"\n\tsolidus {self.properties['solidus_eutectic_temperature'].value} ;"
             f"\n\tliquidus {self.properties['liquidus_temperature'].value} ;"
-            f"\n\tlatent heat {self.properties['latent_heat_fusion'].value} ;"
+            f"\n\tlatent_heat {self.properties['latent_heat_fusion'].value} ;"
             f"\n\t}}"
             f"\n}}"
         )
